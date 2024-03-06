@@ -1,0 +1,13 @@
+keystore_path = "~/.ipc"
+
+# Filecoin Calibration
+[[subnets]]
+id = "/r314159"
+
+[subnets.config]
+network_type = "fevm"
+provider_http = "https://api.calibration.node.glif.io/rpc/v1"
+# The following addresses shoud be up to date.
+# See https://github.com/consensus-shipyard/ipc/blob/cd/contracts/deployments/r314159.json
+gateway_addr = "0xfA6D6c9ccDE5B8a34690F0377F07dbf932b457aC"
+registry_addr = "0x12360EcF961f31d220b5e7E34c05652a68Ec27A0"
