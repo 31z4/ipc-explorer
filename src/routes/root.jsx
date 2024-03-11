@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { listSubnets } from "../ipc"
+import { listSubnets } from '../ipc'
 
-export default function Root() {
+export default function Root () {
   const [subnets, setSubnets] = useState(null)
   const [isLoading, setLoading] = useState(true)
 
