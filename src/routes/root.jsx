@@ -1,40 +1,13 @@
-import { ethers } from 'ethers';
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-
-async function listSubnets () {
-  const provider = new ethers.JsonRpcProvider('https://api.calibration.node.glif.io/rpc/v1')
-
-  const gatewayAddress = '0xfA6D6c9ccDE5B8a34690F0377F07dbf932b457aC'
-  const gatewayGetterAbi = [
-    `function listSubnets() view returns (
-      tuple(
-        uint256 stake,
-        uint256 genesisEpoch,
-        uint256 circSupply,
-        uint64 topDownNonce,
-        uint64 appliedBottomUpNonce,
-        tuple(uint64 root, address[] route) subnetID
-      )[]
-    )`
-  ]
-  const gatewayGetterContract = new ethers.Contract(gatewayAddress, gatewayGetterAbi, provider)
-
-  const subnets = await gatewayGetterContract.listSubnets()
-  return subnets.map(s => {
-    return {
-      subnetID: `/r${s.subnetID.root.toString()}/${s.subnetID.route[0]}`,
-      collateral: ethers.formatUnits(s.stake) + ' FIL',
-      circulatingSupply: ethers.formatUnits(s.circSupply) + ' FIL',
-      genesis: s.genesisEpoch.toString()
-    }
-  })
-}
+import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
+import { listSubnets } from "../ipc"
 
 export default function Root() {
   const [subnets, setSubnets] = useState(null)
   const [isLoading, setLoading] = useState(true)
 
+  // I didn't manage to implement proper loading state using React Router's `useLoaderData` and `useNavigation`.
+  // See https://github.com/remix-run/react-router/issues/9277
   useEffect(() => {
     listSubnets().then(value => {
       setSubnets(value)
@@ -42,7 +15,7 @@ export default function Root() {
     })
   }, [])
 
-  if (isLoading) return <p>Listing subnets...</p>
+  if (isLoading) return <p>Loading subnets...</p>
   if (!subnets) return <p>No subnets found</p>
 
   return (
