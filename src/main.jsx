@@ -1,12 +1,18 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { RouterProvider, createHashRouter } from "react-router-dom";
 import Root from "./routes/root";
+import Subnet from './routes/subnet';
 
-const router = createBrowserRouter([
+// GitHub pages doesn't support browser router out of the box.
+const router = createHashRouter([
   {
     path: "/",
     element: <Root />,
+  },
+  {
+    path: "subnets/*",
+    element: <Subnet />,
   },
 ]);
 

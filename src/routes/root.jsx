@@ -1,5 +1,6 @@
 import { ethers } from 'ethers';
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 async function listSubnets () {
   const provider = new ethers.JsonRpcProvider('https://api.calibration.node.glif.io/rpc/v1')
@@ -58,7 +59,7 @@ export default function Root() {
         {subnets.map(s => (
           <>
             <tr>
-              <td>{s.subnetID}</td>
+              <td><Link to={`subnets${s.subnetID}`}>{s.subnetID}</Link></td>
               <td>{s.collateral}</td>
               <td>{s.circulatingSupply}</td>
               <td>{s.genesis}</td>
