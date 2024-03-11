@@ -1,5 +1,3 @@
-'use client'
-
 import { ethers } from 'ethers'
 import { useEffect, useState } from 'react'
 
@@ -32,7 +30,7 @@ async function listSubnets () {
   })
 }
 
-export default function Page () {
+export default function App() {
   const [subnets, setSubnets] = useState(null)
   const [isLoading, setLoading] = useState(true)
 
