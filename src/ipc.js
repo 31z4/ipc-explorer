@@ -38,15 +38,33 @@ export async function genesisValidators (subnetId) {
         address addr,
         bytes metadata
       )[]
+    )`,
+    `function getValidator(address validatorAddress) view returns (
+      tuple(
+        uint256 federatedPower,
+        uint256 confirmedCollateral,
+        uint256 totalCollateral,
+        bytes metadata
+      )
     )`
   ]
   const subnetActorGetterContract = new ethers.Contract(subnetActorGetterAddress, subnetActorGetterAbi, provider)
 
   const validators = await subnetActorGetterContract.genesisValidators()
-  return validators.map(v => {
-    return {
-      weight: v.weight.toString(),
-      addr: v.addr
-    }
-  })
+  const augmentedValidators = []
+
+  const validatorInfo = async (v) => {
+    const info = await subnetActorGetterContract.getValidator(v.addr)
+    augmentedValidators.push({
+      addr: v.addr,
+      federatedPower: info[0].toString(),
+      confirmedCollateral: ethers.formatUnits(info[1]) + ' FIL',
+      totalCollateral: ethers.formatUnits(info[2]) + ' FIL'
+    })
+  }
+
+  const infoPromices = validators.map(v => validatorInfo(v))
+  await Promise.all(infoPromices)
+
+  return augmentedValidators
 }

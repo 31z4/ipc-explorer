@@ -22,7 +22,9 @@ function GenesisValidators ({ subnetId }) {
       <thead>
         <tr>
           <th>Address</th>
-          <th>Weight</th>
+          <th>Federated Power</th>
+          <th>Confirmed Collateral</th>
+          <th>Total Collateral</th>
         </tr>
       </thead>
       <tbody>
@@ -30,7 +32,9 @@ function GenesisValidators ({ subnetId }) {
           <>
             <tr>
               <td>{v.addr}</td>
-              <td>{v.weight}</td>
+              <td>{v.federatedPower}</td>
+              <td>{v.confirmedCollateral}</td>
+              <td>{v.totalCollateral}</td>
             </tr>
           </>
         ))}
@@ -52,7 +56,7 @@ export default function Subnet () {
 
   return (
     <>
-      <h2>{subnetId}</h2>
+      <h2>Subnet {subnetId}</h2>
       <GenesisValidators subnetId={subnetId} />
     </>
   )
