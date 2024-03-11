@@ -1,5 +1,5 @@
-import { ethers } from 'ethers'
-import { useEffect, useState } from 'react'
+import { ethers } from 'ethers';
+import { useEffect, useState } from 'react';
 
 async function listSubnets () {
   const provider = new ethers.JsonRpcProvider('https://api.calibration.node.glif.io/rpc/v1')
@@ -30,7 +30,7 @@ async function listSubnets () {
   })
 }
 
-export default function App() {
+export default function Root() {
   const [subnets, setSubnets] = useState(null)
   const [isLoading, setLoading] = useState(true)
 
