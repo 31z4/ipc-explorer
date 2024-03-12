@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router'
-import { genesisValidators, subnetDeposits } from '../ipc'
+import { genesisValidators, subnetDeposits, subnetWithdrawals } from '../ipc'
 
 function GenesisValidators ({ subnetId }) {
   const [validators, setValidators] = useState(null)
@@ -100,6 +100,61 @@ function Deposits ({ subnetId }) {
   )
 }
 
+function Withdrawals ({ subnetId }) {
+  const [withdrawals, setWithdrawals] = useState(null)
+  const [isLoading, setLoading] = useState(true)
+
+  // I didn't manage to implement proper loading state using React Router's `useLoaderData` and `useNavigation`.
+  // See https://github.com/remix-run/react-router/issues/9277
+  useEffect(() => {
+    subnetWithdrawals(subnetId).then(value => {
+      setWithdrawals(value)
+      setLoading(false)
+    })
+  }, [subnetId])
+
+  let content
+  if (isLoading) {
+    content = <p>Loading withdrawals...</p>
+  } else if (withdrawals === undefined) {
+    content = <p>Not connected to subnet RPC</p>
+  } else if (!withdrawals.length) {
+    content = <p>No withdrawals found</p>
+  } else {
+    content = (
+      <table>
+      <thead>
+        <tr>
+          <th>Transaction Hash</th>
+          <th>From</th>
+          <th>To</th>
+          <th>Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        {withdrawals.map(w => (
+          <>
+            <tr>
+              <td>{w.transactionHash}</td>
+              <td>{w.from}</td>
+              <td>{w.to}</td>
+              <td>{w.value}</td>
+            </tr>
+          </>
+        ))}
+      </tbody>
+      </table>
+    )
+  }
+
+  return (
+    <>
+      <h3>Withdrawals</h3>
+      {content}
+    </>
+  )
+}
+
 export default function Subnet () {
   const subnetId = `/${useParams()['*']}`
 
@@ -108,6 +163,7 @@ export default function Subnet () {
       <h2>Subnet {subnetId}</h2>
       <GenesisValidators subnetId={subnetId} />
       <Deposits subnetId={subnetId} />
+      <Withdrawals subnetId={subnetId} />
     </>
   )
 }

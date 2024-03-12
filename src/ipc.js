@@ -11,9 +11,15 @@ import { ethers } from 'ethers'
 
 // Gives latest 2879 blocks max.
 const MAX_PROVIDER_BLOCKS = 2879
-const provider = new ethers.JsonRpcProvider('https://calibration.filfox.info/rpc/v1')
+const rootProvider = new ethers.JsonRpcProvider('https://calibration.filfox.info/rpc/v1')
 
-const gatewayAddress = '0xfA6D6c9ccDE5B8a34690F0377F07dbf932b457aC'
+const ROOT_GATEWAY_ADDRESS = '0xfA6D6c9ccDE5B8a34690F0377F07dbf932b457aC'
+const CHILD_GATEWAY_ADDRESS = '0x77aa40b105843728088c0132e43fc44348881da8'
+
+const SUBNET_RPC_PROVIDERS = new Map([
+  ['0x10367c17c45602E2a33b46d2D08F0C3dC0FA2C62', 'https://ipc-test.fluence.dev']
+])
+
 const gatewayAbi = [
     `function listSubnets() view returns (
       tuple(
@@ -41,9 +47,31 @@ const gatewayAbi = [
         uint256 value,
         bytes message
       ) message
+    )`,
+    `event NewBottomUpMsgBatch(
+      uint256 indexed epoch,
+      tuple(
+        tuple(uint64 root, address[] route) subnetId,
+        uint256 blockHeight,
+        tuple(
+          uint8 kind,
+          tuple (
+            tuple(uint64 root, address[] route) subnetId,
+            tuple(uint8 addrType, bytes payload) rawAddress,
+          ) to,
+          tuple (
+            tuple(uint64 root, address[] route) subnetId,
+            tuple(uint8 addrType, bytes payload) rawAddress,
+          ) from,
+          uint64 nonce,
+          uint256 value,
+          bytes message
+        )[] msgs
+      ) batch
     )`
 ]
-const gatewayContract = new ethers.Contract(gatewayAddress, gatewayAbi, provider)
+
+const rootGatewayContract = new ethers.Contract(ROOT_GATEWAY_ADDRESS, gatewayAbi, rootProvider)
 
 function formatFil (value) {
   return `${ethers.formatUnits(value)} FIL`
@@ -61,9 +89,36 @@ function filAddr (payload) {
   return newDelegatedEthAddress(filAddr).toString()
 }
 
+export async function subnetWithdrawals (subnetId) {
+  const subnetProvider = SUBNET_RPC_PROVIDERS.get(subnetAddr(subnetId))
+  if (!subnetProvider) { return undefined }
+
+  const provider = new ethers.JsonRpcProvider(subnetProvider)
+  const gatewayContract = new ethers.Contract(CHILD_GATEWAY_ADDRESS, gatewayAbi, provider)
+  const filter = gatewayContract.filters.NewBottomUpMsgBatch
+  const events = await gatewayContract.queryFilter(filter)
+
+  const withdrawals = []
+  events.forEach(e => {
+    const transfers = e.args.batch.msgs.filter(m => m.kind === 0n) // `0n` means `Transfer`.
+    transfers.forEach(t => {
+      withdrawals.push({
+        transactionHash: e.transactionHash,
+        from: filAddr(t.from.rawAddress.payload),
+        to: filAddr(t.to.rawAddress.payload),
+        value: formatFil(t.value)
+      })
+    })
+  })
+
+  return withdrawals
+}
+
 export async function subnetDeposits (subnetId) {
-  const filter = gatewayContract.filters.NewTopDownMessage(subnetAddr(subnetId))
-  const events = await gatewayContract.queryFilter(filter, -MAX_PROVIDER_BLOCKS)
+  console.log(await subnetWithdrawals(subnetAddr(subnetId)))
+
+  const filter = rootGatewayContract.filters.NewTopDownMessage(subnetAddr(subnetId))
+  const events = await rootGatewayContract.queryFilter(filter, -MAX_PROVIDER_BLOCKS)
   const deposits = events.filter(e => e.args.message.kind === 0n) // `0n` means `Transfer`.
   return deposits.map(e => {
     return {
@@ -76,7 +131,7 @@ export async function subnetDeposits (subnetId) {
 }
 
 export async function listSubnets () {
-  const subnets = await gatewayContract.listSubnets()
+  const subnets = await rootGatewayContract.listSubnets()
   return subnets.map(s => {
     return {
       subnetID: `/r${s.subnetID.root.toString()}/${s.subnetID.route[0]}`,
@@ -105,7 +160,7 @@ export async function genesisValidators (subnetId) {
       )
     )`
   ]
-  const subnetActorGetterContract = new ethers.Contract(subnetAddr(subnetId), subnetActorGetterAbi, provider)
+  const subnetActorGetterContract = new ethers.Contract(subnetAddr(subnetId), subnetActorGetterAbi, rootProvider)
 
   const validators = await subnetActorGetterContract.genesisValidators()
   const augmentedValidators = []
