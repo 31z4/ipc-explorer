@@ -9,6 +9,6 @@ As a user of the explorer I want to:
     - [x] Circulating supply
     - [x] Genesis
 - [x] List subnet genesis validators.
-- [ ] List subnet deposits.
+- [x] List subnet deposits.
 - [ ] List subnet withdrawals.
 - [ ] List subnet checkpoints.

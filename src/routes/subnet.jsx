@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router'
-import { genesisValidators } from '../ipc'
+import { genesisValidators, subnetDeposits } from '../ipc'
 
 function GenesisValidators ({ subnetId }) {
   const [validators, setValidators] = useState(null)
@@ -51,6 +51,55 @@ function GenesisValidators ({ subnetId }) {
   )
 }
 
+function Deposits ({ subnetId }) {
+  const [deposits, setDeposits] = useState(null)
+  const [isLoading, setLoading] = useState(true)
+
+  // I didn't manage to implement proper loading state using React Router's `useLoaderData` and `useNavigation`.
+  // See https://github.com/remix-run/react-router/issues/9277
+  useEffect(() => {
+    subnetDeposits(subnetId).then(value => {
+      setDeposits(value)
+      setLoading(false)
+    })
+  }, [subnetId])
+
+  let content
+  if (isLoading) { content = <p>Loading deposits...</p> } else if (!deposits.length) { content = <p>No deposits found</p> } else {
+    content = (
+      <table>
+      <thead>
+        <tr>
+          <th>Transaction Hash</th>
+          <th>From</th>
+          <th>To</th>
+          <th>Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        {deposits.map(d => (
+          <>
+            <tr>
+              <td>{d.transactionHash}</td>
+              <td>{d.from}</td>
+              <td>{d.to}</td>
+              <td>{d.value}</td>
+            </tr>
+          </>
+        ))}
+      </tbody>
+      </table>
+    )
+  }
+
+  return (
+    <>
+      <h3>Deposits</h3>
+      {content}
+    </>
+  )
+}
+
 export default function Subnet () {
   const subnetId = `/${useParams()['*']}`
 
@@ -58,6 +107,7 @@ export default function Subnet () {
     <>
       <h2>Subnet {subnetId}</h2>
       <GenesisValidators subnetId={subnetId} />
+      <Deposits subnetId={subnetId} />
     </>
   )
 }
