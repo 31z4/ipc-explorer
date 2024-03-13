@@ -139,9 +139,9 @@ export async function listSubnets () {
       subnetAddr: subnetContractAddr(s.subnetID),
       collateral: formatFil(s.stake),
       circulatingSupply: formatFil(s.circSupply),
-      genesis: s.genesisEpoch.toString()
+      genesis: s.genesisEpoch
     }
-  })
+  }).sort((a, b) => b.genesis - a.genesis)
 }
 
 export async function genesisValidators (subnetAddr) {

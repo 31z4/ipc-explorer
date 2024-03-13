@@ -35,7 +35,7 @@ export default function Root () {
               <td><Link to={`subnets${s.subnetId}`} state={{ subnetAddr: s.subnetAddr }}>{s.subnetId}</Link></td>
               <td>{s.collateral}</td>
               <td>{s.circulatingSupply}</td>
-              <td>{s.genesis}</td>
+              <td>{s.genesis.toString()}</td>
             </tr>
           </>
         ))}
