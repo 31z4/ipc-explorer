@@ -32,7 +32,7 @@ export default function Root () {
         {subnets.map(s => (
           <>
             <tr>
-              <td><Link to={`subnets${s.subnetID}`}>{s.subnetID}</Link></td>
+              <td><Link to={`subnets${s.subnetId}`} state={{ subnetAddr: s.subnetAddr }}>{s.subnetId}</Link></td>
               <td>{s.collateral}</td>
               <td>{s.circulatingSupply}</td>
               <td>{s.genesis}</td>

@@ -1,6 +1,6 @@
 import { newDelegatedEthAddress } from '@glif/filecoin-address'
 import { ethers } from 'ethers'
-import { formatFil, subnetAddr } from './utils'
+import { formatFil } from './utils'
 
 // Gives latest 1998 blocks max.
 // const MAX_PROVIDER_BLOCKS = 1998
@@ -82,8 +82,18 @@ function filAddr (payload) {
   return newDelegatedEthAddress(filAddr).toString()
 }
 
-export async function subnetWithdrawals (subnetId) {
-  const subnetProvider = SUBNET_RPC_PROVIDERS.get(subnetAddr(subnetId))
+function formatSubnetId (subnetId) {
+  const root = subnetId.root.toString()
+  const children = subnetId.route.map(c => newDelegatedEthAddress(c).toString())
+  return `/r${root}/${children.join('/')}`
+}
+
+function subnetContractAddr (subnetId) {
+  return subnetId.route[subnetId.route.length - 1]
+}
+
+export async function subnetWithdrawals (subnetAddr) {
+  const subnetProvider = SUBNET_RPC_PROVIDERS.get(subnetAddr)
   if (!subnetProvider) { return undefined }
 
   const provider = new ethers.JsonRpcProvider(subnetProvider)
@@ -107,8 +117,8 @@ export async function subnetWithdrawals (subnetId) {
   return withdrawals
 }
 
-export async function subnetDeposits (subnetId) {
-  const filter = rootGatewayContract.filters.NewTopDownMessage(subnetAddr(subnetId))
+export async function subnetDeposits (subnetAddr) {
+  const filter = rootGatewayContract.filters.NewTopDownMessage(subnetAddr)
   const events = await rootGatewayContract.queryFilter(filter, -MAX_PROVIDER_BLOCKS)
   const deposits = events.filter(e => e.args.message.kind === 0n) // `0n` means `Transfer`.
   return deposits.map(e => {
@@ -125,7 +135,8 @@ export async function listSubnets () {
   const subnets = await rootGatewayContract.listSubnets()
   return subnets.map(s => {
     return {
-      subnetID: `/r${s.subnetID.root.toString()}/${s.subnetID.route[0]}`,
+      subnetId: formatSubnetId(s.subnetID),
+      subnetAddr: subnetContractAddr(s.subnetID),
       collateral: formatFil(s.stake),
       circulatingSupply: formatFil(s.circSupply),
       genesis: s.genesisEpoch.toString()
@@ -133,7 +144,7 @@ export async function listSubnets () {
   })
 }
 
-export async function genesisValidators (subnetId) {
+export async function genesisValidators (subnetAddr) {
   const subnetActorGetterAbi = [
     `function genesisValidators() view returns (
       tuple(
@@ -151,7 +162,7 @@ export async function genesisValidators (subnetId) {
       )
     )`
   ]
-  const subnetActorGetterContract = new ethers.Contract(subnetAddr(subnetId), subnetActorGetterAbi, rootProvider)
+  const subnetActorGetterContract = new ethers.Contract(subnetAddr, subnetActorGetterAbi, rootProvider)
 
   const validators = await subnetActorGetterContract.genesisValidators()
   const augmentedValidators = []

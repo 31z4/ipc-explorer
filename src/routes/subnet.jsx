@@ -1,20 +1,20 @@
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router'
+import { useLocation, useParams } from 'react-router'
 import { recentTransactions } from '../eth'
 import { genesisValidators, subnetDeposits, subnetWithdrawals } from '../ipc'
 
-function GenesisValidators ({ subnetId }) {
+function GenesisValidators ({ subnetAddr }) {
   const [validators, setValidators] = useState(null)
   const [isLoading, setLoading] = useState(true)
 
   // I didn't manage to implement proper loading state using React Router's `useLoaderData` and `useNavigation`.
   // See https://github.com/remix-run/react-router/issues/9277
   useEffect(() => {
-    genesisValidators(subnetId).then(value => {
+    genesisValidators(subnetAddr).then(value => {
       setValidators(value)
       setLoading(false)
     })
-  }, [subnetId])
+  }, [subnetAddr])
 
   let content
   if (isLoading) { content = <p>Loading validators...</p> } else if (!validators) { content = <p>No validators found</p> } else {
@@ -52,18 +52,18 @@ function GenesisValidators ({ subnetId }) {
   )
 }
 
-function Deposits ({ subnetId }) {
+function Deposits ({ subnetAddr }) {
   const [deposits, setDeposits] = useState(null)
   const [isLoading, setLoading] = useState(true)
 
   // I didn't manage to implement proper loading state using React Router's `useLoaderData` and `useNavigation`.
   // See https://github.com/remix-run/react-router/issues/9277
   useEffect(() => {
-    subnetDeposits(subnetId).then(value => {
+    subnetDeposits(subnetAddr).then(value => {
       setDeposits(value)
       setLoading(false)
     })
-  }, [subnetId])
+  }, [subnetAddr])
 
   let content
   if (isLoading) { content = <p>Loading deposits...</p> } else if (!deposits.length) { content = <p>No deposits found</p> } else {
@@ -101,18 +101,18 @@ function Deposits ({ subnetId }) {
   )
 }
 
-function Withdrawals ({ subnetId }) {
+function Withdrawals ({ subnetAddr }) {
   const [withdrawals, setWithdrawals] = useState(null)
   const [isLoading, setLoading] = useState(true)
 
   // I didn't manage to implement proper loading state using React Router's `useLoaderData` and `useNavigation`.
   // See https://github.com/remix-run/react-router/issues/9277
   useEffect(() => {
-    subnetWithdrawals(subnetId).then(value => {
+    subnetWithdrawals(subnetAddr).then(value => {
       setWithdrawals(value)
       setLoading(false)
     })
-  }, [subnetId])
+  }, [subnetAddr])
 
   let content
   if (isLoading) {
@@ -156,18 +156,18 @@ function Withdrawals ({ subnetId }) {
   )
 }
 
-function Transactions ({ subnetId }) {
+function Transactions ({ subnetAddr }) {
   const [transactions, setTransactions] = useState(null)
   const [isLoading, setLoading] = useState(true)
 
   // I didn't manage to implement proper loading state using React Router's `useLoaderData` and `useNavigation`.
   // See https://github.com/remix-run/react-router/issues/9277
   useEffect(() => {
-    recentTransactions(subnetId).then(value => {
+    recentTransactions(subnetAddr).then(value => {
       setTransactions(value)
       setLoading(false)
     })
-  }, [subnetId])
+  }, [subnetAddr])
 
   let content
   if (isLoading) {
@@ -213,14 +213,15 @@ function Transactions ({ subnetId }) {
 
 export default function Subnet () {
   const subnetId = `/${useParams()['*']}`
+  const subnetAddr = useLocation().state.subnetAddr
 
   return (
     <>
       <h2>Subnet {subnetId}</h2>
-      <GenesisValidators subnetId={subnetId} />
-      <Deposits subnetId={subnetId} />
-      <Withdrawals subnetId={subnetId} />
-      <Transactions subnetId={subnetId} />
+      <GenesisValidators subnetAddr={subnetAddr} />
+      <Deposits subnetAddr={subnetAddr} />
+      <Withdrawals subnetAddr={subnetAddr} />
+      <Transactions subnetAddr={subnetAddr} />
     </>
   )
 }

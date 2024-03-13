@@ -1,9 +1,9 @@
 import { ethers, toQuantity } from 'ethers'
 import { SUBNET_RPC_PROVIDERS } from './ipc'
-import { formatFil, subnetAddr } from './utils'
+import { formatFil } from './utils'
 
-export async function recentTransactions (subnetId) {
-  const subnetProvider = SUBNET_RPC_PROVIDERS.get(subnetAddr(subnetId))
+export async function recentTransactions (subnetAddr) {
+  const subnetProvider = SUBNET_RPC_PROVIDERS.get(subnetAddr)
   if (!subnetProvider) { return undefined }
 
   const provider = new ethers.JsonRpcProvider(subnetProvider)
