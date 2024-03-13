@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router'
+import { recentTransactions } from '../eth'
 import { genesisValidators, subnetDeposits, subnetWithdrawals } from '../ipc'
 
 function GenesisValidators ({ subnetId }) {
@@ -155,6 +156,61 @@ function Withdrawals ({ subnetId }) {
   )
 }
 
+function Transactions ({ subnetId }) {
+  const [transactions, setTransactions] = useState(null)
+  const [isLoading, setLoading] = useState(true)
+
+  // I didn't manage to implement proper loading state using React Router's `useLoaderData` and `useNavigation`.
+  // See https://github.com/remix-run/react-router/issues/9277
+  useEffect(() => {
+    recentTransactions(subnetId).then(value => {
+      setTransactions(value)
+      setLoading(false)
+    })
+  }, [subnetId])
+
+  let content
+  if (isLoading) {
+    content = <p>Loading transactions...</p>
+  } else if (transactions === undefined) {
+    content = <p>Not connected to subnet RPC</p>
+  } else if (!transactions.length) {
+    content = <p>No transactions found</p>
+  } else {
+    content = (
+      <table>
+      <thead>
+        <tr>
+          <th>Transaction Hash</th>
+          <th>From</th>
+          <th>To</th>
+          <th>Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        {transactions.map(t => (
+          <>
+            <tr>
+              <td>{t.transactionHash}</td>
+              <td>{t.from}</td>
+              <td>{t.to}</td>
+              <td>{t.value}</td>
+            </tr>
+          </>
+        ))}
+      </tbody>
+      </table>
+    )
+  }
+
+  return (
+    <>
+      <h3>Recent Transactions</h3>
+      {content}
+    </>
+  )
+}
+
 export default function Subnet () {
   const subnetId = `/${useParams()['*']}`
 
@@ -164,6 +220,7 @@ export default function Subnet () {
       <GenesisValidators subnetId={subnetId} />
       <Deposits subnetId={subnetId} />
       <Withdrawals subnetId={subnetId} />
+      <Transactions subnetId={subnetId} />
     </>
   )
 }
