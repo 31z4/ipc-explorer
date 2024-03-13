@@ -17,7 +17,7 @@ const ROOT_GATEWAY_ADDRESS = '0xfA6D6c9ccDE5B8a34690F0377F07dbf932b457aC'
 const CHILD_GATEWAY_ADDRESS = '0x77aa40b105843728088c0132e43fc44348881da8'
 
 const SUBNET_RPC_PROVIDERS = new Map([
-  ['0x10367c17c45602E2a33b46d2D08F0C3dC0FA2C62', 'https://ipc-test.fluence.dev']
+  ['0x30160AFF0EdF3590919b52a07BF17D1F363DA312', 'https://ipc-test.fluence.dev']
 ])
 
 const gatewayAbi = [
@@ -115,8 +115,6 @@ export async function subnetWithdrawals (subnetId) {
 }
 
 export async function subnetDeposits (subnetId) {
-  console.log(await subnetWithdrawals(subnetAddr(subnetId)))
-
   const filter = rootGatewayContract.filters.NewTopDownMessage(subnetAddr(subnetId))
   const events = await rootGatewayContract.queryFilter(filter, -MAX_PROVIDER_BLOCKS)
   const deposits = events.filter(e => e.args.message.kind === 0n) // `0n` means `Transfer`.
