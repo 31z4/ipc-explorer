@@ -131,9 +131,27 @@ export async function subnetDeposits (subnetAddr) {
   })
 }
 
+function subnetStats (subnets) {
+  let totalCollateral = 0n
+  let totalSupply = 0n
+
+  for (const s of subnets) {
+    totalCollateral += s.stake
+    totalSupply += s.circSupply
+  }
+
+  return {
+    count: subnets.length,
+    totalCollateral: formatFil(totalCollateral),
+    totalSupply: formatFil(totalSupply)
+  }
+}
+
 export async function listSubnets () {
   const subnets = await rootGatewayContract.listSubnets()
-  return subnets.map(s => {
+
+  const stats = subnetStats(subnets)
+  const list = subnets.map(s => {
     return {
       subnetId: formatSubnetId(s.subnetID),
       subnetAddr: subnetContractAddr(s.subnetID),
@@ -142,6 +160,8 @@ export async function listSubnets () {
       genesis: s.genesisEpoch
     }
   }).sort((a, b) => b.genesis - a.genesis)
+
+  return { list, stats }
 }
 
 export async function genesisValidators (subnetAddr) {
