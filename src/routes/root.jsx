@@ -21,7 +21,7 @@ function SubnetList ({ subnets }) {
               <td><Link to={`subnets${s.subnetId}`} state={{ subnetAddr: s.subnetAddr }}>{s.subnetId}</Link></td>
               <td>{s.collateral}</td>
               <td>{s.circulatingSupply}</td>
-              <td>{s.genesis}</td>
+              <td><a href={`https://calibration.filfox.info/en/tipset/${s.genesis}`} target='blank'>{s.genesis}</a></td>
               <td>{s.age}</td>
             </tr>
           </>
