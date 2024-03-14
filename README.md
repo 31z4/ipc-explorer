@@ -8,7 +8,7 @@ As a user of the explorer I want to:
     - [x] Collateral
     - [x] Circulating supply
     - [x] Genesis
-    - [ ] Subnet age
+    - [x] Subnet age
 - [x] List subnet genesis validators.
 - [x] List recent subnet deposits.
 - [x] List recent subnet withdrawals.

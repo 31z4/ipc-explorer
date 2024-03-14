@@ -11,6 +11,7 @@ function SubnetList ({ subnets }) {
           <th>Collateral</th>
           <th>Circulating Supply</th>
           <th>Genesis</th>
+          <th>Age</th>
         </tr>
       </thead>
       <tbody>
@@ -20,7 +21,8 @@ function SubnetList ({ subnets }) {
               <td><Link to={`subnets${s.subnetId}`} state={{ subnetAddr: s.subnetAddr }}>{s.subnetId}</Link></td>
               <td>{s.collateral}</td>
               <td>{s.circulatingSupply}</td>
-              <td>{s.genesis.toString()}</td>
+              <td>{s.genesis}</td>
+              <td>{s.age}</td>
             </tr>
           </>
         ))}

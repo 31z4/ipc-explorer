@@ -1,5 +1,6 @@
 import { newDelegatedEthAddress } from '@glif/filecoin-address'
-import { ethers } from 'ethers'
+import { ethers, toNumber, toQuantity } from 'ethers'
+import humanizeDuration from 'humanize-duration'
 import { formatFil } from './utils'
 
 // Gives latest 1998 blocks max.
@@ -160,6 +161,17 @@ export async function listSubnets () {
       genesis: s.genesisEpoch
     }
   }).sort((a, b) => b.genesis - a.genesis)
+
+  const now = Date.now()
+  const subnetAge = async (subnet) => {
+    const block = await rootProvider.send('eth_getBlockByNumber', [toQuantity(subnet.genesis), false])
+    const age = now - toNumber(block.timestamp * 1000)
+    subnet.age = humanizeDuration(age, { round: true, largest: 1 })
+    subnet.genesis = subnet.genesis.toString()
+  }
+
+  const agePromices = list.map(s => subnetAge(s))
+  await Promise.all(agePromices)
 
   return { list, stats }
 }
