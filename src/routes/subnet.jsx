@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useLocation, useParams } from 'react-router'
+import { RootBlockLink } from '../RootBlockLink'
+import { RootContractLink } from '../RootContractLink'
 import { recentTransactions } from '../eth'
-import { genesisValidators, subnetDeposits, subnetWithdrawals } from '../ipc'
+import { genesisValidators, subnetDeposits, subnetInfo, subnetWithdrawals } from '../ipc'
 
 function GenesisValidators ({ subnetAddr }) {
   const [validators, setValidators] = useState(null)
@@ -211,17 +213,121 @@ function Transactions ({ subnetAddr }) {
   )
 }
 
+function SubnetInfo ({ subnet }) {
+  const [info, setInfo] = useState(null)
+  const [isLoading, setLoading] = useState(true)
+
+  // I didn't manage to implement proper loading state using React Router's `useLoaderData` and `useNavigation`.
+  // See https://github.com/remix-run/react-router/issues/9277
+  useEffect(() => {
+    subnetInfo(subnet.subnetAddr).then(value => {
+      setInfo(value)
+      setLoading(false)
+    })
+  }, [subnet.subnetAddr])
+
+  let content
+  if (isLoading) {
+    content = (
+        <tr>
+          <td>Loading subnet info...</td>
+        </tr>
+    )
+  } else if (!info) {
+    content = (
+      <tr>
+        <td>Could not load subnet info</td>
+      </tr>
+    )
+  } else {
+    const contract = info.supplySourceAddr ? <RootContractLink addr={info.supplySourceAddr} /> : ''
+    content = (
+      <>
+        <tr>
+          <th scope='row'>Permission Mode</th>
+          <td>{info.permissionMode}</td>
+        </tr>
+        <tr>
+          <th scope='row'>Minimum Validators</th>
+          <td>{info.minValidators}</td>
+        </tr>
+        <tr>
+          <th scope='row'>Majority</th>
+          <td>{info.majorityPercentage}%</td>
+        </tr>
+        <tr>
+          <th scope='row'>Active Validators Limit</th>
+          <td>{info.activeValidatorsLimit}</td>
+        </tr>
+        <tr>
+          <th scope='row'>Bottom-up Check Period</th>
+          <td>{info.bottomUpCheckPeriod}</td>
+        </tr>
+        <tr>
+          <th scope='row'>Consensus</th>
+          <td>{info.consensus}</td>
+        </tr>
+        <tr>
+          <th scope='row'>Activation Collateral</th>
+          <td>{info.minActivationCollateral}</td>
+        </tr>
+        <tr>
+          <th scope='row'>Power Scale</th>
+          <td>{info.powerScale}</td>
+        </tr>
+        <tr>
+          <th scope='row'>Supply Source</th>
+          <td>{info.supplySourceKind} {contract}</td>
+        </tr>
+        <tr>
+          <th scope='row'>State</th>
+          <td>{info.state}</td>
+        </tr>
+      </>
+    )
+  }
+
+  return (
+    <table>
+      <tbody>
+          <tr>
+            <th scope='row'>Contract Address</th>
+            <td><RootContractLink addr={subnet.subnetAddr} /></td>
+          </tr>
+          <tr>
+            <th scope='row'>Created</th>
+            <td>{subnet.created_at}</td>
+          </tr>
+          <tr>
+            <th scope='row'>Genesis Block</th>
+            <td><RootBlockLink block={subnet.genesis} /></td>
+          </tr>
+          <tr>
+            <th scope='row'>Collateral</th>
+            <td>{subnet.collateral}</td>
+          </tr>
+          <tr>
+            <th scope='row'>Circulating Supply</th>
+            <td>{subnet.circulatingSupply}</td>
+          </tr>
+          {content}
+      </tbody>
+    </table>
+  )
+}
+
 export default function Subnet () {
   const subnetId = `/${useParams()['*']}`
-  const subnetAddr = useLocation().state.subnetAddr
+  const subnet = useLocation().state
 
   return (
     <>
       <h2>Subnet {subnetId}</h2>
-      <GenesisValidators subnetAddr={subnetAddr} />
-      <Deposits subnetAddr={subnetAddr} />
-      <Withdrawals subnetAddr={subnetAddr} />
-      <Transactions subnetAddr={subnetAddr} />
+      <SubnetInfo subnet={subnet} />
+      <GenesisValidators subnetAddr={subnet.subnetAddr} />
+      <Deposits subnetAddr={subnet.subnetAddr} />
+      <Withdrawals subnetAddr={subnet.subnetAddr} />
+      <Transactions subnetAddr={subnet.subnetAddr} />
     </>
   )
 }

@@ -73,6 +73,54 @@ const gatewayAbi = [
     )`
 ]
 
+const SUBNET_ACTOR_ABI = [
+  `function genesisValidators() view returns (
+    tuple(
+      uint256 weight,
+      address addr,
+      bytes metadata
+    )[]
+  )`,
+  `function getValidator(address validatorAddress) view returns (
+    tuple(
+      uint256 federatedPower,
+      uint256 confirmedCollateral,
+      uint256 totalCollateral,
+      bytes metadata
+    )
+  )`,
+  'function permissionMode() view returns (uint8)',
+  'function minValidators() view returns (uint64)',
+  'function majorityPercentage() view returns (uint8)',
+  'function activeValidatorsLimit() view returns (uint16)',
+  'function bottomUpCheckPeriod() view returns (uint256)',
+  'function consensus() view returns (uint8)',
+  'function killed() view returns (bool)',
+  'function minActivationCollateral() view returns (uint256)',
+  'function powerScale() view returns (int8)',
+  `function supplySource() view returns (
+    tuple(
+      uint8 kind,
+      address tokenAddress,
+    )
+  )`
+]
+
+const SUBNET_PERMISSION_MODE = new Map([
+  [0n, 'Collateral'],
+  [1n, 'Federated'],
+  [2n, 'Static']
+])
+
+const SUBNET_CONSENSUS_TYPE = new Map([
+  [0n, 'Fendermint']
+])
+
+const SUBNET_SUPPLY_KIND = new Map([
+  [0n, 'Native'],
+  [1n, 'ERC20']
+])
+
 const rootGatewayContract = new ethers.Contract(ROOT_GATEWAY_ADDRESS, gatewayAbi, rootProvider)
 
 function filAddr (payload) {
@@ -165,8 +213,11 @@ export async function listSubnets () {
   const now = Date.now()
   const subnetAge = async (subnet) => {
     const block = await rootProvider.send('eth_getBlockByNumber', [toQuantity(subnet.genesis), false])
-    const age = now - toNumber(block.timestamp * 1000)
+    const blockTimestamp = block.timestamp * 1000
+    const age = now - toNumber(blockTimestamp)
+
     subnet.age = humanizeDuration(age, { round: true, largest: 1 })
+    subnet.created_at = new Date(blockTimestamp).toUTCString()
     subnet.genesis = subnet.genesis.toString()
   }
 
@@ -176,31 +227,66 @@ export async function listSubnets () {
   return { list, stats }
 }
 
-export async function genesisValidators (subnetAddr) {
-  const subnetActorGetterAbi = [
-    `function genesisValidators() view returns (
-      tuple(
-        uint256 weight,
-        address addr,
-        bytes metadata
-      )[]
-    )`,
-    `function getValidator(address validatorAddress) view returns (
-      tuple(
-        uint256 federatedPower,
-        uint256 confirmedCollateral,
-        uint256 totalCollateral,
-        bytes metadata
-      )
-    )`
-  ]
-  const subnetActorGetterContract = new ethers.Contract(subnetAddr, subnetActorGetterAbi, rootProvider)
+export async function subnetInfo (subnetAddr) {
+  const subnetActorContract = new ethers.Contract(subnetAddr, SUBNET_ACTOR_ABI, rootProvider)
+  const info = {}
 
-  const validators = await subnetActorGetterContract.genesisValidators()
+  await Promise.all([
+    (async () => {
+      info.permissionMode = await subnetActorContract.permissionMode()
+    })(),
+    (async () => {
+      info.minValidators = await subnetActorContract.minValidators()
+    })(),
+    (async () => {
+      info.majorityPercentage = await subnetActorContract.majorityPercentage()
+    })(),
+    (async () => {
+      info.activeValidatorsLimit = await subnetActorContract.activeValidatorsLimit()
+    })(),
+    (async () => {
+      info.bottomUpCheckPeriod = await subnetActorContract.bottomUpCheckPeriod()
+    })(),
+    (async () => {
+      info.consensus = await subnetActorContract.consensus()
+    })(),
+    (async () => {
+      info.killed = await subnetActorContract.killed()
+    })(),
+    (async () => {
+      info.minActivationCollateral = await subnetActorContract.minActivationCollateral()
+    })(),
+    (async () => {
+      info.powerScale = await subnetActorContract.powerScale()
+    })(),
+    (async () => {
+      info.supplySource = await subnetActorContract.supplySource()
+    })()
+  ])
+
+  return {
+    permissionMode: SUBNET_PERMISSION_MODE.get(info.permissionMode),
+    minValidators: info.minValidators.toString(),
+    majorityPercentage: info.majorityPercentage.toString(),
+    activeValidatorsLimit: info.activeValidatorsLimit.toString(),
+    bottomUpCheckPeriod: info.bottomUpCheckPeriod.toString(),
+    consensus: SUBNET_CONSENSUS_TYPE.get(info.consensus),
+    state: info.killed ? 'Killed' : 'Active',
+    minActivationCollateral: formatFil(info.minActivationCollateral),
+    powerScale: info.powerScale.toString(),
+    supplySourceKind: SUBNET_SUPPLY_KIND.get(info.supplySource[0]),
+    supplySourceAddr: info.supplySource[1] === '0x0000000000000000000000000000000000000000' ? '' : info.supplySource[1]
+  }
+}
+
+export async function genesisValidators (subnetAddr) {
+  const subnetActorContract = new ethers.Contract(subnetAddr, SUBNET_ACTOR_ABI, rootProvider)
+
+  const validators = await subnetActorContract.genesisValidators()
   const augmentedValidators = []
 
   const validatorInfo = async (v) => {
-    const info = await subnetActorGetterContract.getValidator(v.addr)
+    const info = await subnetActorContract.getValidator(v.addr)
     augmentedValidators.push({
       addr: v.addr,
       federatedPower: info[0].toString(),

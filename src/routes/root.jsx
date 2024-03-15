@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { RootBlockLink } from '../RootBlockLink'
 import { listSubnets } from '../ipc'
 
 function SubnetList ({ subnets }) {
@@ -18,10 +19,10 @@ function SubnetList ({ subnets }) {
         {subnets.map(s => (
           <>
             <tr>
-              <td><Link to={`subnets${s.subnetId}`} state={{ subnetAddr: s.subnetAddr }}>{s.subnetId}</Link></td>
+              <td><Link to={`subnets${s.subnetId}`} state={s}>{s.subnetId}</Link></td>
               <td>{s.collateral}</td>
               <td>{s.circulatingSupply}</td>
-              <td><a href={`https://calibration.filfox.info/en/tipset/${s.genesis}`} target='blank'>{s.genesis}</a></td>
+              <td><RootBlockLink block={s.genesis} /></td>
               <td>{s.age}</td>
             </tr>
           </>
