@@ -19,6 +19,7 @@ function SubnetList ({ subnets }) {
         {subnets.map(s => (
           <>
             <tr>
+              {/* Passing state won't work if opening in a new tab or window. */}
               <td><Link to={`subnets${s.subnetId}`} state={s}>{s.subnetId}</Link></td>
               <td>{s.collateral}</td>
               <td>{s.circulatingSupply}</td>

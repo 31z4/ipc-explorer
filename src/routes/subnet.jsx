@@ -25,19 +25,19 @@ function GenesisValidators ({ subnetAddr }) {
       <thead>
         <tr>
           <th>Address</th>
-          <th>Federated Power</th>
           <th>Confirmed Collateral</th>
           <th>Total Collateral</th>
+          <th>State</th>
         </tr>
       </thead>
       <tbody>
         {validators.map(v => (
           <>
             <tr>
-              <td>{v.addr}</td>
-              <td>{v.federatedPower}</td>
+              <td><RootContractLink addr={v.addr} /></td>
               <td>{v.confirmedCollateral}</td>
               <td>{v.totalCollateral}</td>
+              <td>{v.state}</td>
             </tr>
           </>
         ))}

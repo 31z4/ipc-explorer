@@ -103,7 +103,9 @@ const SUBNET_ACTOR_ABI = [
       uint8 kind,
       address tokenAddress,
     )
-  )`
+  )`,
+  'function isActiveValidator(address validator) view returns (bool)',
+  'function isWaitingValidator(address validator) view returns (bool)'
 ]
 
 const SUBNET_PERMISSION_MODE = new Map([
@@ -279,23 +281,38 @@ export async function subnetInfo (subnetAddr) {
   }
 }
 
+async function validatorInfo (subnetActorContract, addr) {
+  const info = await subnetActorContract.getValidator(addr)
+  const active = await subnetActorContract.isActiveValidator(addr)
+  const waiting = await subnetActorContract.isWaitingValidator(addr)
+
+  let state = 'Unknown'
+  if (active) {
+    state = 'Active'
+  } else if (waiting) {
+    state = 'Waiting'
+  }
+
+  return {
+    addr,
+    state,
+    confirmedCollateral: formatFil(info[1]),
+    totalCollateral: formatFil(info[2])
+  }
+}
+
 export async function genesisValidators (subnetAddr) {
   const subnetActorContract = new ethers.Contract(subnetAddr, SUBNET_ACTOR_ABI, rootProvider)
 
   const validators = await subnetActorContract.genesisValidators()
   const augmentedValidators = []
 
-  const validatorInfo = async (v) => {
-    const info = await subnetActorContract.getValidator(v.addr)
-    augmentedValidators.push({
-      addr: v.addr,
-      federatedPower: info[0].toString(),
-      confirmedCollateral: formatFil(info[1]),
-      totalCollateral: formatFil(info[2])
-    })
+  const validatorInfoFn = async (v) => {
+    const info = await validatorInfo(subnetActorContract, v.addr)
+    augmentedValidators.push(info)
   }
 
-  const infoPromices = validators.map(v => validatorInfo(v))
+  const infoPromices = validators.map(v => validatorInfoFn(v))
   await Promise.all(infoPromices)
 
   return augmentedValidators
