@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useLocation, useParams } from 'react-router'
+import { RootAddressLink } from '../RootAddressLink'
 import { RootBlockLink } from '../RootBlockLink'
-import { RootContractLink } from '../RootContractLink'
+import { RootMessageLink } from '../RootMessageLink'
+
 import { recentTransactions } from '../eth'
 import { genesisValidators, subnetDeposits, subnetInfo, subnetWithdrawals } from '../ipc'
 
@@ -34,7 +36,7 @@ function GenesisValidators ({ subnetAddr }) {
         {validators.map(v => (
           <>
             <tr>
-              <td><RootContractLink addr={v.addr} /></td>
+              <td><RootAddressLink addr={v.addr} /></td>
               <td>{v.confirmedCollateral}</td>
               <td>{v.totalCollateral}</td>
               <td>{v.state}</td>
@@ -83,8 +85,8 @@ function Deposits ({ subnetAddr }) {
         {deposits.map(d => (
           <>
             <tr>
-              <td>{d.transactionHash}</td>
-              <td>{d.from}</td>
+              <td><RootMessageLink hash={d.transactionHash} /></td>
+              <td><RootAddressLink addr={d.from} /></td>
               <td>{d.to}</td>
               <td>{d.value}</td>
             </tr>
@@ -240,7 +242,7 @@ function SubnetInfo ({ subnet }) {
       </tr>
     )
   } else {
-    const contract = info.supplySourceAddr ? <RootContractLink addr={info.supplySourceAddr} /> : ''
+    const contract = info.supplySourceAddr ? <RootAddressLink addr={info.supplySourceAddr} /> : ''
     content = (
       <>
         <tr>
@@ -292,7 +294,7 @@ function SubnetInfo ({ subnet }) {
       <tbody>
           <tr>
             <th scope='row'>Contract Address</th>
-            <td><RootContractLink addr={subnet.subnetAddr} /></td>
+            <td><RootAddressLink addr={subnet.subnetAddr} /></td>
           </tr>
           <tr>
             <th scope='row'>Created</th>
