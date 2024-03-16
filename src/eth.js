@@ -8,10 +8,7 @@ export async function recentTransactions (subnetAddr) {
 
   const provider = new ethers.JsonRpcProvider(subnetProvider)
 
-  // const currentBlock = await provider.send('eth_blockNumber')
-  // Most recent blocks on Fluence IPC subnet don't have any transactions.
-  // So we just hardcode a block with transactions for demo purpose.
-  const currentBlock = 35193
+  const currentBlock = await provider.send('eth_blockNumber')
   const transactions = []
 
   for (let n = currentBlock; n > currentBlock - 10; n--) {

@@ -19,7 +19,8 @@ const ROOT_GATEWAY_ADDRESS = '0x7226EF1e479EeAa805859125a0B11b846054cc03'
 const CHILD_GATEWAY_ADDRESS = '0x77aa40b105843728088c0132e43fc44348881da8'
 
 export const SUBNET_RPC_PROVIDERS = new Map([
-  ['0x30160AFF0EdF3590919b52a07BF17D1F363DA312', 'https://ipc-test.fluence.dev']
+  // Here can be a map of subnets to their RPC provider URLs.
+  // ['SUBNET_CONTRACT_ETH_ADDR', 'RPC_PROVIDER_URL']
 ])
 
 const gatewayAbi = [
