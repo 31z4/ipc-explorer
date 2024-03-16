@@ -15,7 +15,7 @@ import { formatFil } from './utils'
 const MAX_PROVIDER_BLOCKS = 2879
 const rootProvider = new ethers.JsonRpcProvider('https://calibration.filfox.info/rpc/v1')
 
-const ROOT_GATEWAY_ADDRESS = '0xfA6D6c9ccDE5B8a34690F0377F07dbf932b457aC'
+const ROOT_GATEWAY_ADDRESS = '0x7226EF1e479EeAa805859125a0B11b846054cc03'
 const CHILD_GATEWAY_ADDRESS = '0x77aa40b105843728088c0132e43fc44348881da8'
 
 export const SUBNET_RPC_PROVIDERS = new Map([

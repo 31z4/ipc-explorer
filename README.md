@@ -39,18 +39,8 @@ id = "/r314159"
 [subnets.config]
 network_type = "fevm"
 provider_http = "https://api.calibration.node.glif.io/rpc/v1"
-gateway_addr = "0xfA6D6c9ccDE5B8a34690F0377F07dbf932b457aC"
-registry_addr = "0x12360EcF961f31d220b5e7E34c05652a68Ec27A0"
-
-# As seen on #ipc-dev channel of Filecoin Slack.
-[[subnets]]
-id = "/r314159/t410fgalav7yo342zbem3kkqhx4l5d43d3iyswlpwkby"
-
-[subnets.config]
-network_type = "fevm"
-provider_http = "https://ipc-test.fluence.dev"
-gateway_addr = "0x77aa40b105843728088c0132e43fc44348881da8"
-registry_addr = "0x74539671a1d2f1c8f200826baba665179f53a1b7"
+gateway_addr = "0x7226EF1e479EeAa805859125a0B11b846054cc03"
+registry_addr = "0xc92058Aa735800750939cE40427CA8134f848e74"
 EOF
 ```
 
@@ -98,9 +88,6 @@ subnet=NEW_SUBNET_ID pubkey=NEW_WALLET_PUBKEY make ipc-cli-join-subnet
 
 #### Deposit funds
 
-Since we don't have a running validator node we'll use Fluence test subnet.
-Note that it may not be available in the future.
-
 ```sh
-subnet=/r314159/t410fgalav7yo342zbem3kkqhx4l5d43d3iyswlpwkby amount=0.01 make ipc-cli-fund
+subnet=NEW_SUBNET_ID amount=0.01 make ipc-cli-fund
 ```
