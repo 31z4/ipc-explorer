@@ -39,14 +39,12 @@ id = "/r314159"
 [subnets.config]
 network_type = "fevm"
 provider_http = "https://api.calibration.node.glif.io/rpc/v1"
-gateway_addr = "0x7226EF1e479EeAa805859125a0B11b846054cc03"
-registry_addr = "0xc92058Aa735800750939cE40427CA8134f848e74"
+gateway_addr = "`curl -s https://raw.githubusercontent.com/consensus-shipyard/ipc/cd/contracts/deployments/r314159.json | jq -r '.gateway_addr'`"
+registry_addr = "`curl -s https://raw.githubusercontent.com/consensus-shipyard/ipc/cd/contracts/deployments/r314159.json | jq -r '.registry_addr'`"
 EOF
 ```
 
-Make sure that `gateway_addr` and `registry_addr` of the root net `/r314159` match the most recent values published at [this link](https://github.com/consensus-shipyard/ipc/blob/cd/contracts/deployments/r314159.json).
-
-Also, note the non-default `keystore_path`.
+Note the non-default `keystore_path`.
 This is the path where a Docker volume will be mounted to persist wallet keys for `ipc-cli` container.
 
 3. Set up a new wallet.
