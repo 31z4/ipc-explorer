@@ -3,9 +3,9 @@ import { useLocation, useParams } from 'react-router'
 import { RootAddressLink } from '../RootAddressLink'
 import { RootBlockLink } from '../RootBlockLink'
 import { RootMessageLink } from '../RootMessageLink'
+import { SUBNET_RPC_PROVIDERS, genesisValidators, subnetDeposits, subnetInfo, subnetWithdrawals } from '../ipc'
 
 import { recentTransactions } from '../eth'
-import { genesisValidators, subnetDeposits, subnetInfo, subnetWithdrawals } from '../ipc'
 
 function GenesisValidators ({ subnetAddr }) {
   const [validators, setValidators] = useState(null)
@@ -105,27 +105,35 @@ function Deposits ({ subnetAddr }) {
   )
 }
 
-function Withdrawals ({ subnetAddr }) {
-  const [withdrawals, setWithdrawals] = useState(null)
-  const [isLoading, setLoading] = useState(true)
+function Withdrawals ({ providerUrl, setProviderUrl }) {
+  const [withdrawals, setWithdrawals] = useState([])
+  const [isLoading, setLoading] = useState(false)
 
   // I didn't manage to implement proper loading state using React Router's `useLoaderData` and `useNavigation`.
   // See https://github.com/remix-run/react-router/issues/9277
   useEffect(() => {
-    subnetWithdrawals(subnetAddr).then(value => {
+    if (!providerUrl) { return }
+
+    setLoading(true)
+    subnetWithdrawals(providerUrl).then(value => {
       setWithdrawals(value)
       setLoading(false)
     })
-  }, [subnetAddr])
+  }, [providerUrl])
 
   let content
   if (isLoading) {
     content = <p>Loading withdrawals...</p>
-  } else if (withdrawals === undefined) {
-    content = <p>Not connected to subnet RPC</p>
-  } else if (!withdrawals.length) {
+  } else if (!providerUrl) {
+    content = (
+      <>
+        Not connected to subnet RPC
+        <button onClick={setProviderUrl}>Connect</button>
+      </>
+    )
+  } else if (withdrawals.length === 0) {
     content = <p>No withdrawals found</p>
-  } else {
+  } else if (withdrawals.length > 0) {
     content = (
       <table>
       <thead>
@@ -160,27 +168,35 @@ function Withdrawals ({ subnetAddr }) {
   )
 }
 
-function Transactions ({ subnetAddr }) {
-  const [transactions, setTransactions] = useState(null)
-  const [isLoading, setLoading] = useState(true)
+function Transactions ({ providerUrl, setProviderUrl }) {
+  const [transactions, setTransactions] = useState([])
+  const [isLoading, setLoading] = useState(false)
 
   // I didn't manage to implement proper loading state using React Router's `useLoaderData` and `useNavigation`.
   // See https://github.com/remix-run/react-router/issues/9277
   useEffect(() => {
-    recentTransactions(subnetAddr).then(value => {
+    if (!providerUrl) { return }
+
+    setLoading(true)
+    recentTransactions(providerUrl).then(value => {
       setTransactions(value)
       setLoading(false)
     })
-  }, [subnetAddr])
+  }, [providerUrl])
 
   let content
   if (isLoading) {
     content = <p>Loading transactions...</p>
-  } else if (transactions === undefined) {
-    content = <p>Not connected to subnet RPC</p>
-  } else if (!transactions.length) {
+  } else if (!providerUrl) {
+    content = (
+      <>
+        Not connected to subnet RPC
+        <button onClick={setProviderUrl}>Connect</button>
+      </>
+    )
+  } else if (transactions.length === 0) {
     content = <p>No transactions found</p>
-  } else {
+  } else if (transactions.length > 0) {
     content = (
       <table>
       <thead>
@@ -322,14 +338,21 @@ export default function Subnet () {
   const subnetId = `/${useParams()['*']}`
   const subnet = useLocation().state
 
+  const [providerUrl, setProviderUrl] = useState(SUBNET_RPC_PROVIDERS.get(subnet.subnetAddr))
+
+  function promptProviderUrl () {
+    const url = window.prompt('Enter subnet RPC provider URL', 'http://localhost:8545')
+    if (url) { setProviderUrl(url) }
+  }
+
   return (
     <>
       <h2>Subnet {subnetId}</h2>
       <SubnetInfo subnet={subnet} />
       <GenesisValidators subnetAddr={subnet.subnetAddr} />
       <Deposits subnetAddr={subnet.subnetAddr} />
-      <Withdrawals subnetAddr={subnet.subnetAddr} />
-      <Transactions subnetAddr={subnet.subnetAddr} />
+      <Withdrawals providerUrl={providerUrl} setProviderUrl={promptProviderUrl} />
+      <Transactions providerUrl={providerUrl} setProviderUrl={promptProviderUrl} />
     </>
   )
 }

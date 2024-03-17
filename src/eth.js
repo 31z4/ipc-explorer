@@ -1,12 +1,8 @@
 import { ethers, toQuantity } from 'ethers'
-import { SUBNET_RPC_PROVIDERS } from './ipc'
 import { formatFil } from './utils'
 
-export async function recentTransactions (subnetAddr) {
-  const subnetProvider = SUBNET_RPC_PROVIDERS.get(subnetAddr)
-  if (!subnetProvider) { return undefined }
-
-  const provider = new ethers.JsonRpcProvider(subnetProvider)
+export async function recentTransactions (providerUrl) {
+  const provider = new ethers.JsonRpcProvider(providerUrl)
 
   const currentBlock = await provider.send('eth_blockNumber')
   const transactions = []

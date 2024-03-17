@@ -3,16 +3,10 @@ import { ethers, toNumber, toQuantity } from 'ethers'
 import humanizeDuration from 'humanize-duration'
 import { formatFil } from './utils'
 
-// Gives latest 1998 blocks max.
-// const MAX_PROVIDER_BLOCKS = 1998
+// 1500 blocks should work across majority of the public providers.
+const MAX_PROVIDER_BLOCKS = 1500
 // const provider = new ethers.JsonRpcProvider('https://api.calibration.node.glif.io/rpc/v1')
-
-// Gives latest 2879 blocks max.
-// const MAX_PROVIDER_BLOCKS = 2879
 // const provider = new ethers.JsonRpcProvider('https://rpc.ankr.com/filecoin_testnet')
-
-// Gives latest 2879 blocks max.
-const MAX_PROVIDER_BLOCKS = 2879
 const rootProvider = new ethers.JsonRpcProvider('https://calibration.filfox.info/rpc/v1')
 
 const ROOT_GATEWAY_ADDRESS = '0x7226EF1e479EeAa805859125a0B11b846054cc03'
@@ -144,11 +138,8 @@ function subnetContractAddr (subnetId) {
   return subnetId.route[subnetId.route.length - 1]
 }
 
-export async function subnetWithdrawals (subnetAddr) {
-  const subnetProvider = SUBNET_RPC_PROVIDERS.get(subnetAddr)
-  if (!subnetProvider) { return undefined }
-
-  const provider = new ethers.JsonRpcProvider(subnetProvider)
+export async function subnetWithdrawals (providerUrl) {
+  const provider = new ethers.JsonRpcProvider(providerUrl)
   const gatewayContract = new ethers.Contract(CHILD_GATEWAY_ADDRESS, gatewayAbi, provider)
   const filter = gatewayContract.filters.NewBottomUpMsgBatch
   const events = await gatewayContract.queryFilter(filter)
