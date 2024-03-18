@@ -1,6 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { RouterProvider, createHashRouter } from 'react-router-dom'
+import './index.sass'
 import Root from './routes/root'
 import Subnet from './routes/subnet'
 
