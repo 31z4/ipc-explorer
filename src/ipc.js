@@ -128,10 +128,15 @@ function filAddr (payload) {
   return newDelegatedEthAddress(filAddr).toString()
 }
 
+function formatSubnetIdShort (subnetId) {
+  const children = subnetId.route.map(c => newDelegatedEthAddress(c).toString())
+  return children.join('/')
+}
+
 function formatSubnetId (subnetId) {
   const root = subnetId.root.toString()
-  const children = subnetId.route.map(c => newDelegatedEthAddress(c).toString())
-  return `/r${root}/${children.join('/')}`
+  const children = formatSubnetIdShort(subnetId)
+  return `/r${root}/${children}`
 }
 
 function subnetContractAddr (subnetId) {
@@ -197,6 +202,7 @@ export async function listSubnets () {
   const list = subnets.map(s => {
     return {
       subnetId: formatSubnetId(s.subnetID),
+      subnetIdShort: formatSubnetIdShort(s.subnetID),
       subnetAddr: subnetContractAddr(s.subnetID),
       collateral: formatFil(s.stake),
       circulatingSupply: formatFil(s.circSupply),

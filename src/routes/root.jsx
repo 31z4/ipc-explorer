@@ -8,11 +8,11 @@ function SubnetList ({ subnets }) {
     <table>
       <thead>
         <tr>
-          <th>Subnet ID</th>
-          <th>Collateral</th>
-          <th>Circulating Supply</th>
-          <th>Genesis</th>
-          <th>Age</th>
+          <th style={{ width: '33%' }}>Subnet ID</th>
+          <th >Collateral</th>
+          <th >Circulating Supply</th>
+          <th >Genesis</th>
+          <th >Age</th>
         </tr>
       </thead>
       <tbody>
@@ -20,7 +20,7 @@ function SubnetList ({ subnets }) {
           <>
             <tr>
               {/* Passing state won't work if opening in a new tab or window. */}
-              <td><Link to={`subnets${s.subnetId}`} state={s}>{s.subnetId}</Link></td>
+              <td className='u-truncate'><Link to={`subnets${s.subnetId}`} state={s}>{s.subnetIdShort}</Link></td>
               <td>{s.collateral}</td>
               <td>{s.circulatingSupply}</td>
               <td><RootBlockLink block={s.genesis} /></td>
