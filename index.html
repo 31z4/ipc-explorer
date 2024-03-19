@@ -7,14 +7,39 @@
     %VITE_HEAD_SNIPPET%
   </head>
   <body>
-    <h1>IPC Explorer</h1>
-    <div id="root"></div>
+    <header class="p-strip is-dark is-shallow">
+      <div class="row">
+        <a href="#" class="p-heading--1 p-link--inverted">IPC Explorer</a>
+      </div>
+    </header>
+
+    <div class="row">
+      <br/>
+      <div class="col" id="root"></div>
+    </div>
+
     <script type="module" src="/src/main.jsx"></script>
 
-    <br />
-    <footer>
-      Made by <address><a href="https://t.me/e1z4n">Elisey Zanko</a></address>
-      Project <a href="https://github.com/31z4/ipc-explorer">GitHub</a>
+    <footer class="p-strip is-dark">
+      <div class="row--25-75">
+        <div class="col">
+          <p>© 2024 Elisey Zanko</p>
+        </div>
+        <div class="col">
+          <p>Browse and explore <a href="https://www.ipc.space">InterPlanetary Consensus</a> (IPC) subnets</p>
+          <ul class="p-inline-list--middot">
+            <li class="p-inline-list__item">
+              <a href="https://github.com/31z4/ipc-explorer"><small>GitHub</small></a>
+            </li>
+            <li class="p-inline-list__item">
+              <a href="https://t.me/e1z4n"><small>Telegram</small></a>
+            </li>
+            <li class="p-inline-list__item">
+              <a href="https://twitter.com/e1z4"><small>X</small></a>
+            </li>
+          </ul>
+        </div>
+      </div>
     </footer>
   </body>
 </html>
