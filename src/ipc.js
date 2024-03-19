@@ -1,5 +1,5 @@
 import { newDelegatedEthAddress } from '@glif/filecoin-address'
-import { ethers, toNumber, toQuantity } from 'ethers'
+import { ethers, toBigInt, toNumber, toQuantity } from 'ethers'
 import humanizeDuration from 'humanize-duration'
 import { formatFil } from './utils'
 
@@ -199,6 +199,9 @@ export async function listSubnets () {
   const subnets = await rootGatewayContract.listSubnets()
 
   const stats = subnetStats(subnets)
+  const rootBlock = await rootProvider.send('eth_blockNumber')
+  stats.rootBlock = toBigInt(rootBlock).toString()
+
   const list = subnets.map(s => {
     return {
       subnetId: formatSubnetId(s.subnetID),
@@ -211,6 +214,7 @@ export async function listSubnets () {
   }).sort((a, b) => b.genesis - a.genesis)
 
   const now = Date.now()
+
   const subnetAge = async (subnet) => {
     const block = await rootProvider.send('eth_getBlockByNumber', [toQuantity(subnet.genesis), false])
     const blockTimestamp = block.timestamp * 1000

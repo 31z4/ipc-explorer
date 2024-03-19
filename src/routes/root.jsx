@@ -35,22 +35,24 @@ function SubnetList ({ subnets }) {
 
 function SubnetStats ({ stats }) {
   return (
-    <table>
-      <tbody>
-          <tr>
-            <th scope='row'>Total Subnets</th>
-            <td>{stats.count}</td>
-          </tr>
-          <tr>
-            <th scope='row'>Total Collateral</th>
-            <td>{stats.totalCollateral}</td>
-          </tr>
-          <tr>
-            <th scope='row'>Total Supply</th>
-            <td>{stats.totalSupply}</td>
-          </tr>
-      </tbody>
-    </table>
+    <div className='row--25-25-25-25'>
+      <div className="p-card--highlighted col">
+        <h3>{stats.count}</h3>
+        <p className="p-card__content">Total Subnets</p>
+      </div>
+      <div className="p-card--highlighted col">
+        <h3>{stats.totalCollateral}</h3>
+        <p className="p-card__content">Total Collateral</p>
+      </div>
+      <div className="p-card--highlighted col">
+        <h3>{stats.totalSupply}</h3>
+        <p className="p-card__content">Total Supply</p>
+      </div>
+      <div className="p-card--highlighted col">
+        <h3>{stats.rootBlock}</h3>
+        <p className="p-card__content">Root Block</p>
+      </div>
+    </div>
   )
 }
 
