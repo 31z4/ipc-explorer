@@ -4,6 +4,19 @@ import { RootBlockLink } from '../RootBlockLink'
 import { listSubnets } from '../ipc'
 
 function SubnetList ({ subnets }) {
+  let caption = ''
+  if (subnets.length === 0) {
+    caption = (
+      <caption>
+        <div className='p-strip'>
+          <div className='row'>
+            <p className='p-heading--4'>No subnets found</p>
+          </div>
+        </div>
+      </caption>
+    )
+  }
+
   return (
     <table>
       <thead>
@@ -15,6 +28,7 @@ function SubnetList ({ subnets }) {
           <th >Age</th>
         </tr>
       </thead>
+      {caption}
       <tbody>
         {subnets.map(s => (
           <>
@@ -50,14 +64,14 @@ function SubnetStats ({ stats }) {
       </div>
       <div className="p-card--highlighted col">
         <h3>{stats.rootBlock}</h3>
-        <p className="p-card__content">Root Block</p>
+        <p className="p-card__content">Block Height</p>
       </div>
     </div>
   )
 }
 
 export default function Root () {
-  const [subnets, setSubnets] = useState(null)
+  const [subnets, setSubnets] = useState([])
   const [isLoading, setLoading] = useState(true)
 
   // I didn't manage to implement proper loading state using React Router's `useLoaderData` and `useNavigation`.
@@ -70,7 +84,6 @@ export default function Root () {
   }, [])
 
   if (isLoading) return <p>Loading subnets...</p>
-  if (!subnets) return <p>No subnets found</p>
 
   return (
     <>
