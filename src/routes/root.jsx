@@ -83,7 +83,15 @@ export default function Root () {
     })
   }, [])
 
-  if (isLoading) return <p>Loading subnets...</p>
+  if (isLoading) {
+    return (
+      <div className='p-strip'>
+          <span className="u-has-icon p-heading--4">
+            <i className="p-icon--in-progress u-animation--spin"></i>Loading subnets...
+          </span>
+      </div>
+    )
+  }
 
   return (
     <>
