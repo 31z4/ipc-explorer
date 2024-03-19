@@ -209,7 +209,7 @@ export async function listSubnets () {
       subnetAddr: subnetContractAddr(s.subnetID),
       collateral: formatFil(s.stake),
       circulatingSupply: formatFil(s.circSupply),
-      genesis: s.genesisEpoch
+      genesis: BigInt(s.genesisEpoch)
     }
   }).sort((a, b) => b.genesis - a.genesis)
 

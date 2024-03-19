@@ -84,6 +84,7 @@ export default function Root () {
     }, (err) => {
       setError(err)
       setLoading(false)
+      console.error(err)
     })
   }, [])
 
