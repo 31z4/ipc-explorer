@@ -202,6 +202,18 @@ export async function listSubnets () {
   const rootBlock = await rootProvider.send('eth_blockNumber')
   stats.rootBlock = toBigInt(rootBlock).toString()
 
+  // Reliable function to compare bigints.
+  // You cannot simply substract b from a because the function must return a Number.
+  // But converting a bigint to a Number can throw an exception.
+  function compareGenesis (a, b) {
+    if (a.genesis > b.genesis) {
+      return -1
+    } else if (a.genesis < b.genesis) {
+      return 1
+    }
+    return 0
+  }
+
   const list = subnets.map(s => {
     return {
       subnetId: formatSubnetId(s.subnetID),
@@ -209,9 +221,9 @@ export async function listSubnets () {
       subnetAddr: subnetContractAddr(s.subnetID),
       collateral: formatFil(s.stake),
       circulatingSupply: formatFil(s.circSupply),
-      genesis: BigInt(s.genesisEpoch)
+      genesis: s.genesisEpoch
     }
-  }).sort((a, b) => b.genesis - a.genesis)
+  }).sort(compareGenesis)
 
   const now = Date.now()
 
