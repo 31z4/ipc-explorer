@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useLocation, useParams } from 'react-router'
+import { useLocation } from 'react-router'
 import { RootAddressLink } from '../RootAddressLink'
 import { RootBlockLink } from '../RootBlockLink'
 import { RootMessageLink } from '../RootMessageLink'
@@ -335,7 +335,6 @@ function SubnetInfo ({ subnet }) {
 }
 
 export default function Subnet () {
-  const subnetId = `/${useParams()['*']}`
   const subnet = useLocation().state
 
   const [providerUrl, setProviderUrl] = useState(SUBNET_RPC_PROVIDERS.get(subnet.subnetAddr))
@@ -347,7 +346,7 @@ export default function Subnet () {
 
   return (
     <>
-      <h2>Subnet {subnetId}</h2>
+      <h3 className='u-truncate'><a href="#">/r314159</a>/{subnet.subnetIdShort}</h3>
       <SubnetInfo subnet={subnet} />
       <GenesisValidators subnetAddr={subnet.subnetAddr} />
       <Deposits subnetAddr={subnet.subnetAddr} />

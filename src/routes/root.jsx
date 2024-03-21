@@ -34,7 +34,7 @@ function SubnetList ({ subnets }) {
           <>
             <tr>
               {/* Passing state won't work if opening in a new tab or window. */}
-              <td className='u-truncate'><Link to={`subnets${s.subnetId}`} state={s}>{s.subnetIdShort}</Link></td>
+              <td className='u-truncate'><Link to={`subnets${s.subnetId}`} state={s} onClick= {() => window.scrollTo(0, 0)}>{s.subnetIdShort}</Link></td>
               <td>{s.collateral}</td>
               <td>{s.circulatingSupply}</td>
               <td><RootBlockLink block={s.genesis} /></td>
