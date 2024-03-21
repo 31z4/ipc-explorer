@@ -8,8 +8,9 @@ import { SUBNET_RPC_PROVIDERS, genesisValidators, subnetDeposits, subnetInfo, su
 import { recentTransactions } from '../eth'
 
 function GenesisValidators ({ subnetAddr }) {
-  const [validators, setValidators] = useState(null)
+  const [validators, setValidators] = useState([])
   const [isLoading, setLoading] = useState(true)
+  const [isError, setError] = useState(null)
 
   // I didn't manage to implement proper loading state using React Router's `useLoaderData` and `useNavigation`.
   // See https://github.com/remix-run/react-router/issues/9277
@@ -17,41 +18,72 @@ function GenesisValidators ({ subnetAddr }) {
     genesisValidators(subnetAddr).then(value => {
       setValidators(value)
       setLoading(false)
+    }, (err) => {
+      setError(err)
+      setLoading(false)
+      console.error(err)
     })
   }, [subnetAddr])
 
-  let content
-  if (isLoading) { content = <p>Loading validators...</p> } else if (!validators) { content = <p>No validators found</p> } else {
-    content = (
-      <table>
-      <thead>
-        <tr>
-          <th>Address</th>
-          <th>Confirmed Collateral</th>
-          <th>Total Collateral</th>
-          <th>State</th>
-        </tr>
-      </thead>
-      <tbody>
-        {validators.map(v => (
-          <>
-            <tr>
-              <td><RootAddressLink addr={v.addr} /></td>
-              <td>{v.confirmedCollateral}</td>
-              <td>{v.totalCollateral}</td>
-              <td>{v.state}</td>
-            </tr>
-          </>
-        ))}
-      </tbody>
-      </table>
+  let caption = ''
+  if (isLoading) {
+    caption = (
+      <caption>
+        <span className="u-has-icon">
+          <i className="p-icon--in-progress u-animation--spin"></i>Loading validators...
+        </span>
+      </caption>
+    )
+  } else if (isError) {
+    caption = (
+      <caption>
+        <span className="u-has-icon">
+          <i className="p-icon--warning"></i>Could not load validators
+        </span>
+      </caption>
+    )
+  } else if (validators.length === 0) {
+    caption = (
+      <caption>
+        No validators found
+      </caption>
     )
   }
 
   return (
     <>
       <h3>Genesis Validators</h3>
-      {content}
+      <table>
+      <thead>
+        <tr>
+          <th style={{ width: '50%' }}>Address</th>
+          <th>Confirmed Collateral</th>
+          <th>Total Collateral</th>
+          <th>State</th>
+        </tr>
+      </thead>
+      {caption}
+      <tbody>
+        {validators.map(v => {
+          let stateClass = 'p-status-label'
+          if (v.state === 'Active') {
+            stateClass = 'p-status-label--positive'
+          } else if (v.state === 'Waiting') {
+            stateClass = 'p-status-label--information'
+          }
+          return (
+            <>
+              <tr>
+                <td><RootAddressLink addr={v.addr} /></td>
+                <td>{v.confirmedCollateral}</td>
+                <td>{v.totalCollateral}</td>
+                <td><div className={stateClass}>{v.state}</div></td>
+              </tr>
+            </>
+          )
+        })}
+      </tbody>
+      </table>
     </>
   )
 }
