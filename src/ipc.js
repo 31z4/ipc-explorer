@@ -9,7 +9,7 @@ const MAX_PROVIDER_BLOCKS = 1500
 // const provider = new ethers.JsonRpcProvider('https://rpc.ankr.com/filecoin_testnet')
 const rootProvider = new ethers.JsonRpcProvider('https://calibration.filfox.info/rpc/v1')
 
-const ROOT_GATEWAY_ADDRESS = '0x0571602E01C06197A9284BBfcCA0092CBdC1f12A'
+const ROOT_GATEWAY_ADDRESS = '0x6d25fbFac9e6215E03C687E54F7c74f489949EaF'
 const CHILD_GATEWAY_ADDRESS = '0x77aa40b105843728088c0132e43fc44348881da8'
 
 export const SUBNET_RPC_PROVIDERS = new Map([
