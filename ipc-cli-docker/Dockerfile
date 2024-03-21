@@ -17,7 +17,7 @@ RUN set -eux; \
 RUN set -eux; \
     git clone https://github.com/consensus-shipyard/ipc.git; \
     cd /ipc; \
-    git checkout 048c5815075f611e22eec0137453d8ca5d0846ff
+    git checkout 017daa729ad99e2580d5e7d2a1bb934fd43d2f5a
 
 # Final build.
 RUN set -eux; \
