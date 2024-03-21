@@ -285,7 +285,7 @@ export async function subnetInfo (subnetAddr) {
     minValidators: info.minValidators.toString(),
     majorityPercentage: info.majorityPercentage.toString(),
     activeValidatorsLimit: info.activeValidatorsLimit.toString(),
-    bottomUpCheckPeriod: info.bottomUpCheckPeriod.toString(),
+    bottomUpCheckPeriod: humanizeDuration(toNumber(info.bottomUpCheckPeriod) * 1000),
     consensus: SUBNET_CONSENSUS_TYPE.get(info.consensus),
     state: info.killed ? 'Killed' : 'Active',
     minActivationCollateral: formatFil(info.minActivationCollateral),

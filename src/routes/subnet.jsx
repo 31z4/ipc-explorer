@@ -234,6 +234,7 @@ function Transactions ({ providerUrl, setProviderUrl }) {
 function SubnetInfo ({ subnet }) {
   const [info, setInfo] = useState(null)
   const [isLoading, setLoading] = useState(true)
+  const [isError, setError] = useState(null)
 
   // I didn't manage to implement proper loading state using React Router's `useLoaderData` and `useNavigation`.
   // See https://github.com/remix-run/react-router/issues/9277
@@ -241,21 +242,30 @@ function SubnetInfo ({ subnet }) {
     subnetInfo(subnet.subnetAddr).then(value => {
       setInfo(value)
       setLoading(false)
+    }, (err) => {
+      setError(err)
+      setLoading(false)
+      console.error(err)
     })
   }, [subnet.subnetAddr])
 
-  let content
+  let content = ''
+  let caption = ''
   if (isLoading) {
-    content = (
-        <tr>
-          <td>Loading subnet info...</td>
-        </tr>
+    caption = (
+      <caption>
+        <span className="u-has-icon">
+          <i className="p-icon--in-progress u-animation--spin"></i>Loading subnet info...
+        </span>
+      </caption>
     )
-  } else if (!info) {
-    content = (
-      <tr>
-        <td>Could not load subnet info</td>
-      </tr>
+  } else if (isError) {
+    caption = (
+      <caption>
+        <span className="u-has-icon">
+          <i className="p-icon--warning"></i>Could not load subnet info
+        </span>
+      </caption>
     )
   } else {
     const contract = info.supplySourceAddr ? <RootAddressLink addr={info.supplySourceAddr} /> : ''
@@ -299,7 +309,9 @@ function SubnetInfo ({ subnet }) {
         </tr>
         <tr>
           <th scope='row'>State</th>
-          <td>{info.state}</td>
+          <td>
+            <div className={info.state === 'Active' ? 'p-status-label--positive' : 'p-status-label--negative'}>{info.state}</div>
+          </td>
         </tr>
       </>
     )
@@ -307,6 +319,7 @@ function SubnetInfo ({ subnet }) {
 
   return (
     <table>
+      {caption}
       <tbody>
           <tr>
             <th scope='row'>Contract Address</th>
