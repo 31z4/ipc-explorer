@@ -1,3 +1,6 @@
+run-proxy:
+	mitmdump --mode reverse:$(upstream) --listen-host localhost --listen-port 8545 -s mitmproxy/cors.py
+
 build-ipc-cli-docker:
 	docker build -t ipc-cli ipc-cli-docker
 
