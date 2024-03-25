@@ -59,7 +59,6 @@ export function Withdrawals ({ providerUrl, setProviderUrl }) {
         <table>
         <thead>
           <tr>
-            <th>Transaction Hash</th>
             <th>From</th>
             <th>To</th>
             <th>Value</th>
@@ -70,7 +69,6 @@ export function Withdrawals ({ providerUrl, setProviderUrl }) {
           {withdrawals.map(w => (
             <>
               <tr>
-                <td>{w.transactionHash}</td>
                 <td>{w.from}</td>
                 <td>{w.to}</td>
                 <td>{w.value}</td>

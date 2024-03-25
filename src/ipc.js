@@ -45,8 +45,8 @@ const gatewayAbi = [
         bytes message
       ) message
     )`,
-    `event NewBottomUpMsgBatch(
-      uint256 indexed epoch,
+    'event NewBottomUpMsgBatch(uint256 indexed epoch)',
+    `function bottomUpMsgBatch(uint256 epoch) view returns (
       tuple(
         tuple(uint64 root, address[] route) subnetId,
         uint256 blockHeight,
@@ -64,7 +64,7 @@ const gatewayAbi = [
           uint256 value,
           bytes message
         )[] msgs
-      ) batch
+      )
     )`
 ]
 
@@ -149,12 +149,20 @@ export async function subnetWithdrawals (providerUrl) {
   const filter = gatewayContract.filters.NewBottomUpMsgBatch
   const events = await gatewayContract.queryFilter(filter)
 
+  const batches = []
+  const bottomUpMsgBatch = async (epoch) => {
+    const b = await gatewayContract.bottomUpMsgBatch(epoch)
+    batches.push(b)
+  }
+
+  const batchPromices = events.map(e => bottomUpMsgBatch(e.args.epoch))
+  await Promise.all(batchPromices)
+
   const withdrawals = []
-  events.forEach(e => {
-    const transfers = e.args.batch.msgs.filter(m => m.kind === 0n) // `0n` means `Transfer`.
+  batches.forEach(b => {
+    const transfers = b.msgs.filter(m => m.kind === 0n) // `0n` means `Transfer`.
     transfers.forEach(t => {
       withdrawals.push({
-        transactionHash: e.transactionHash,
         from: filAddr(t.from.rawAddress.payload),
         to: filAddr(t.to.rawAddress.payload),
         value: formatFil(t.value)
