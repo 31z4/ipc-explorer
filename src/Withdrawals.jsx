@@ -4,6 +4,7 @@ import { subnetWithdrawals } from './ipc'
 export function Withdrawals ({ providerUrl, setProviderUrl }) {
   const [withdrawals, setWithdrawals] = useState([])
   const [isLoading, setLoading] = useState(false)
+  const [isError, setError] = useState(null)
 
   // I didn't manage to implement proper loading state using React Router's `useLoaderData` and `useNavigation`.
   // See https://github.com/remix-run/react-router/issues/9277
@@ -14,23 +15,47 @@ export function Withdrawals ({ providerUrl, setProviderUrl }) {
     subnetWithdrawals(providerUrl).then(value => {
       setWithdrawals(value)
       setLoading(false)
+    }, (err) => {
+      setError(err)
+      setLoading(false)
+      console.error(err)
     })
   }, [providerUrl])
 
-  let content
-  if (isLoading) {
-    content = <p>Loading withdrawals...</p>
-  } else if (!providerUrl) {
-    content = (
-        <>
-          Not connected to subnet RPC
-          <button onClick={setProviderUrl}>Connect</button>
-        </>
+  let caption = ''
+  if (!providerUrl) {
+    caption = (
+        <caption>
+          Not connected to subnet RPC <button onClick={setProviderUrl}>Connect</button>
+        </caption>
+    )
+  } else if (isLoading) {
+    caption = (
+      <caption>
+        <span className="u-has-icon">
+          <i className="p-icon--in-progress u-animation--spin"></i>Loading withdrawals...
+        </span>
+      </caption>
+    )
+  } else if (isError) {
+    caption = (
+        <caption>
+          <span className="u-has-icon">
+            <i className="p-icon--warning"></i>Could not load withdrawals
+          </span>
+        </caption>
     )
   } else if (withdrawals.length === 0) {
-    content = <p>No withdrawals found</p>
-  } else if (withdrawals.length > 0) {
-    content = (
+    caption = (
+      <caption>
+        No withdrawals found
+      </caption>
+    )
+  }
+
+  return (
+      <>
+        <h3>Withdrawals</h3>
         <table>
         <thead>
           <tr>
@@ -40,6 +65,7 @@ export function Withdrawals ({ providerUrl, setProviderUrl }) {
             <th>Value</th>
           </tr>
         </thead>
+        {caption}
         <tbody>
           {withdrawals.map(w => (
             <>
@@ -53,13 +79,6 @@ export function Withdrawals ({ providerUrl, setProviderUrl }) {
           ))}
         </tbody>
         </table>
-    )
-  }
-
-  return (
-      <>
-        <h3>Withdrawals</h3>
-        {content}
       </>
   )
 }

@@ -4,6 +4,7 @@ import { recentTransactions } from './eth'
 export function Transactions ({ providerUrl, setProviderUrl }) {
   const [transactions, setTransactions] = useState([])
   const [isLoading, setLoading] = useState(false)
+  const [isError, setError] = useState(null)
 
   // I didn't manage to implement proper loading state using React Router's `useLoaderData` and `useNavigation`.
   // See https://github.com/remix-run/react-router/issues/9277
@@ -14,23 +15,47 @@ export function Transactions ({ providerUrl, setProviderUrl }) {
     recentTransactions(providerUrl).then(value => {
       setTransactions(value)
       setLoading(false)
+    }, (err) => {
+      setError(err)
+      setLoading(false)
+      console.error(err)
     })
   }, [providerUrl])
 
-  let content
-  if (isLoading) {
-    content = <p>Loading transactions...</p>
-  } else if (!providerUrl) {
-    content = (
-        <>
-          Not connected to subnet RPC
-          <button onClick={setProviderUrl}>Connect</button>
-        </>
+  let caption = ''
+  if (!providerUrl) {
+    caption = (
+        <caption>
+          Not connected to subnet RPC <button onClick={setProviderUrl}>Connect</button>
+        </caption>
+    )
+  } else if (isLoading) {
+    caption = (
+      <caption>
+        <span className="u-has-icon">
+          <i className="p-icon--in-progress u-animation--spin"></i>Loading transactions...
+        </span>
+      </caption>
+    )
+  } else if (isError) {
+    caption = (
+        <caption>
+          <span className="u-has-icon">
+            <i className="p-icon--warning"></i>Could not load transactions
+          </span>
+        </caption>
     )
   } else if (transactions.length === 0) {
-    content = <p>No transactions found</p>
-  } else if (transactions.length > 0) {
-    content = (
+    caption = (
+      <caption>
+        No transactions found
+      </caption>
+    )
+  }
+
+  return (
+      <>
+        <h3>Recent Transactions</h3>
         <table>
         <thead>
           <tr>
@@ -40,26 +65,20 @@ export function Transactions ({ providerUrl, setProviderUrl }) {
             <th>Value</th>
           </tr>
         </thead>
+        {caption}
         <tbody>
-          {transactions.map(t => (
+          {transactions.map(w => (
             <>
               <tr>
-                <td>{t.transactionHash}</td>
-                <td>{t.from}</td>
-                <td>{t.to}</td>
-                <td>{t.value}</td>
+                <td>{w.transactionHash}</td>
+                <td>{w.from}</td>
+                <td>{w.to}</td>
+                <td>{w.value}</td>
               </tr>
             </>
           ))}
         </tbody>
         </table>
-    )
-  }
-
-  return (
-      <>
-        <h3>Recent Transactions</h3>
-        {content}
       </>
   )
 }
