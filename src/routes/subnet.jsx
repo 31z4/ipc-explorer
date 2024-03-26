@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useLocation } from 'react-router'
 import { Deposits } from '../Deposits'
 import { GenesisValidators } from '../GenesisValidators'
+import { LastCheckpoint } from '../LastCheckpoint'
 import { SubnetInfo } from '../SubnetInfo'
 import { Transactions } from '../Transactions'
 import { Withdrawals } from '../Withdrawals'
@@ -20,6 +21,7 @@ export default function Subnet () {
     <>
       <h3 className='u-truncate'><a href="#">/r314159</a>/{subnet.subnetIdShort}</h3>
       <SubnetInfo subnet={subnet} />
+      <LastCheckpoint subnetAddr={subnet.subnetAddr} />
       <GenesisValidators subnetAddr={subnet.subnetAddr} />
       <Deposits subnetAddr={subnet.subnetAddr} />
       <Withdrawals providerUrl={providerUrl} setProviderUrl={promptProviderUrl} />

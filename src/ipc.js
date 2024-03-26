@@ -89,6 +89,7 @@ const SUBNET_ACTOR_ABI = [
   'function majorityPercentage() view returns (uint8)',
   'function activeValidatorsLimit() view returns (uint16)',
   'function bottomUpCheckPeriod() view returns (uint256)',
+  'function lastBottomUpCheckpointHeight() view returns (uint256)',
   'function consensus() view returns (uint8)',
   'function killed() view returns (bool)',
   'function minActivationCollateral() view returns (uint256)',
@@ -100,7 +101,30 @@ const SUBNET_ACTOR_ABI = [
     )
   )`,
   'function isActiveValidator(address validator) view returns (bool)',
-  'function isWaitingValidator(address validator) view returns (bool)'
+  'function isWaitingValidator(address validator) view returns (bool)',
+  `function bottomUpCheckpointAtEpoch(uint256 epoch) view returns (
+    bool exists,
+    tuple(
+      tuple(uint64 root, address[] route) subnetId,
+      uint256 blockHeight,
+      bytes32 blockHash,
+      uint64 nextConfigurationNumber,
+      tuple(
+        uint8 kind,
+        tuple (
+          tuple(uint64 root, address[] route) subnetId,
+          tuple(uint8 addrType, bytes payload) rawAddress,
+        ) to,
+        tuple (
+          tuple(uint64 root, address[] route) subnetId,
+          tuple(uint8 addrType, bytes payload) rawAddress,
+        ) from,
+        uint64 nonce,
+        uint256 value,
+        bytes message
+      )[] msgs
+    ) checkpoint
+  )`
 ]
 
 const SUBNET_PERMISSION_MODE = new Map([
@@ -116,6 +140,12 @@ const SUBNET_CONSENSUS_TYPE = new Map([
 const SUBNET_SUPPLY_KIND = new Map([
   [0n, 'Native'],
   [1n, 'ERC20']
+])
+
+const IPC_MSG_KIND = new Map([
+  [0n, 'Transfer'],
+  [1n, 'Call'],
+  [2n, 'Result']
 ])
 
 const rootGatewayContract = new ethers.Contract(ROOT_GATEWAY_ADDRESS, gatewayAbi, rootProvider)
@@ -249,6 +279,36 @@ export async function listSubnets () {
   await Promise.all(agePromices)
 
   return { list, stats }
+}
+
+export async function lastCheckpoint (subnetAddr) {
+  const subnetActorContract = new ethers.Contract(subnetAddr, SUBNET_ACTOR_ABI, rootProvider)
+
+  const lastBottomUpCheckpointHeight = await subnetActorContract.lastBottomUpCheckpointHeight()
+  if (lastBottomUpCheckpointHeight === 0n) {
+    return {
+      exists: false,
+      msgs: []
+    }
+  }
+
+  const checkpoint = await subnetActorContract.bottomUpCheckpointAtEpoch(lastBottomUpCheckpointHeight)
+  const msgs = checkpoint.checkpoint.msgs.map(m => {
+    return {
+      kind: IPC_MSG_KIND.get(m.kind),
+      from: filAddr(m.from.rawAddress.payload),
+      to: filAddr(m.to.rawAddress.payload),
+      value: formatFil(m.value)
+    }
+  })
+
+  return {
+    exists: checkpoint.exists,
+    blockHeight: checkpoint.checkpoint.blockHeight.toString(),
+    blockHash: checkpoint.checkpoint.blockHash,
+    nextConfigurationNumber: checkpoint.checkpoint.nextConfigurationNumber.toString(),
+    msgs
+  }
 }
 
 export async function subnetInfo (subnetAddr) {
