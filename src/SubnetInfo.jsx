@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { HeaderWithTooltip } from './HeaderWithTooltip'
 import { RootAddressLink } from './RootAddressLink'
 import { RootBlockLink } from './RootBlockLink'
 import { subnetInfo } from './ipc'
@@ -44,39 +45,84 @@ export function SubnetInfo ({ subnet }) {
     content = (
         <>
           <tr>
-            <th scope='row'>Permission Mode</th>
+            <HeaderWithTooltip
+              header="Permission Mode"
+              headerScope="row"
+              tooltip="Permission mode for validators"
+              tooltipPosition="top-left"
+            />
             <td>{info.permissionMode}</td>
           </tr>
           <tr>
-            <th scope='row'>Minimum Validators</th>
+            <HeaderWithTooltip
+              header="Minimum Validators"
+              headerScope="row"
+              tooltip="Minimum validators number needed to activate the subnet"
+              tooltipPosition="top-left"
+            />
             <td>{info.minValidators}</td>
           </tr>
           <tr>
-            <th scope='row'>Majority</th>
+            <HeaderWithTooltip
+              header="Majority"
+              headerScope="row"
+              tooltip="Majority percentage required for consensus"
+              tooltipPosition="top-left"
+            />
             <td>{info.majorityPercentage}%</td>
           </tr>
           <tr>
-            <th scope='row'>Active Validators Limit</th>
+            <HeaderWithTooltip
+              header="Active Validators Limit"
+              headerScope="row"
+              tooltip="Limit on the number of active validators"
+              tooltipPosition="top-left"
+            />
             <td>{info.activeValidatorsLimit}</td>
           </tr>
           <tr>
-            <th scope='row'>Bottom-up Check Period</th>
+            <HeaderWithTooltip
+              header="Bottom-up Check Period"
+              headerScope="row"
+              tooltip="Period for bottom-up checkpointing operations"
+              tooltipPosition="top-left"
+            />
             <td>{info.bottomUpCheckPeriod}</td>
           </tr>
           <tr>
-            <th scope='row'>Consensus</th>
+            <HeaderWithTooltip
+              header="Consensus"
+              headerScope="row"
+              tooltip="Consensus protocol type used in the subnet"
+              tooltipPosition="top-left"
+            />
             <td>{info.consensus}</td>
           </tr>
           <tr>
-            <th scope='row'>Activation Collateral</th>
+            <HeaderWithTooltip
+              header="Activation Collateral"
+              headerScope="row"
+              tooltip="Minimum collateral required for subnet activation"
+              tooltipPosition="top-left"
+            />
             <td>{info.minActivationCollateral}</td>
           </tr>
           <tr>
-            <th scope='row'>Power Scale</th>
+            <HeaderWithTooltip
+              header="Power Scale"
+              headerScope="row"
+              tooltip="Power scale determining the accuracy of the power scale (in number of decimals from whole FIL)"
+              tooltipPosition="top-left"
+            />
             <td>{info.powerScale}</td>
           </tr>
           <tr>
-            <th scope='row'>Supply Source</th>
+            <HeaderWithTooltip
+              header="Supply Source"
+              headerScope="row"
+              tooltip="Supply strategy for the subnet"
+              tooltipPosition="top-left"
+            />
             <td>{info.supplySourceKind} {contract}</td>
           </tr>
           <tr>
@@ -102,7 +148,12 @@ export function SubnetInfo ({ subnet }) {
               <td>{subnet.created_at}</td>
             </tr>
             <tr>
-              <th scope='row'>Genesis Block</th>
+              <th scope='row' className='with-tooltip'>
+                <span className='p-tooltip--top-left' aria-describedby="genesis-tooltip">
+                  Genesis Block&nbsp;<i className="p-icon--information"></i>
+                  <span className="p-tooltip__message" role="tooltip" id="genesis-tooltip">Parent block in which the subnet was created</span>
+                </span>
+              </th>
               <td><RootBlockLink block={subnet.genesis} /></td>
             </tr>
             <tr>

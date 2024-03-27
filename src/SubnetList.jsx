@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { HeaderWithTooltip } from './HeaderWithTooltip'
 import { RootBlockLink } from './RootBlockLink'
 
 export function SubnetList ({ subnets }) {
@@ -20,10 +21,20 @@ export function SubnetList ({ subnets }) {
         <thead>
           <tr>
             <th style={{ width: '33%' }}>Subnet ID</th>
-            <th >Collateral</th>
-            <th >Circulating Supply</th>
-            <th >Genesis</th>
-            <th >Age</th>
+            <th>Collateral</th>
+            <th>Circulating Supply</th>
+            <HeaderWithTooltip
+              header="Genesis"
+              headerScope="col"
+              tooltip="Parent block in which the subnet was created"
+              tooltipPosition="top-right"
+            />
+            <HeaderWithTooltip
+              header="Age"
+              headerScope="col"
+              tooltip="How long ago the subnet was created"
+              tooltipPosition="top-right"
+            />
           </tr>
         </thead>
         {caption}
