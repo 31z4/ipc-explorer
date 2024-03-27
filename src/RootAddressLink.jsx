@@ -1,3 +1,3 @@
-export function RootAddressLink ({ addr }) {
-  return <a href={`https://calibration.filfox.info/en/address/${addr}`} target='blank'>{addr}</a>
+export function RootAddressLink ({ addrShort, addrFull }) {
+  return <a href={`https://calibration.filfox.info/en/address/${addrShort}`} target='blank'>{addrFull}</a>
 }

@@ -69,7 +69,7 @@ export function Deposits ({ subnetAddr }) {
             <>
               <tr>
                 <td><RootMessageLink hash={d.transactionHash} /></td>
-                <td><RootAddressLink addr={d.from} /></td>
+                <td><RootAddressLink addrShort={d.rootFrom} addrFull={d.from} /></td>
                 <td>{d.to}</td>
                 <td>{d.value}</td>
               </tr>

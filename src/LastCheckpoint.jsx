@@ -86,7 +86,7 @@ export function LastCheckpoint ({ subnetAddr }) {
       <table>
         <caption>
           <span className="u-has-icon">
-            <i className="p-icon--warning"></i>Checkpoint does not exist
+            <i className="p-icon--warning"></i>No committed bottom-up checkpoint
           </span>
         </caption>
       </table>

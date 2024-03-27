@@ -158,15 +158,22 @@ function filAddr (payload) {
   return newDelegatedEthAddress(filAddr).toString()
 }
 
+function ipcAddr (subnetId, payload) {
+  return `${formatSubnetId(subnetId)}/${filAddr(payload)}`
+}
+
 function formatSubnetIdShort (subnetId) {
   const children = subnetId.route.map(c => newDelegatedEthAddress(c).toString())
   return children.join('/')
 }
 
 function formatSubnetId (subnetId) {
-  const root = subnetId.root.toString()
+  const root = `/r${subnetId.root.toString()}`
   const children = formatSubnetIdShort(subnetId)
-  return `/r${root}/${children}`
+  if (children) {
+    return `${root}/${children}`
+  }
+  return root
 }
 
 function subnetContractAddr (subnetId) {
@@ -193,8 +200,8 @@ export async function subnetWithdrawals (providerUrl) {
     const transfers = b.msgs.filter(m => m.kind === 0n) // `0n` means `Transfer`.
     transfers.forEach(t => {
       withdrawals.push({
-        from: filAddr(t.from.rawAddress.payload),
-        to: filAddr(t.to.rawAddress.payload),
+        from: ipcAddr(t.from.subnetId, t.from.rawAddress.payload),
+        to: ipcAddr(t.to.subnetId, t.to.rawAddress.payload),
         value: formatFil(t.value)
       })
     })
@@ -210,8 +217,9 @@ export async function subnetDeposits (subnetAddr) {
   return deposits.map(e => {
     return {
       transactionHash: e.transactionHash,
-      from: filAddr(e.args.message.from.rawAddress.payload),
-      to: filAddr(e.args.message.to.rawAddress.payload),
+      rootFrom: filAddr(e.args.message.from.rawAddress.payload),
+      from: ipcAddr(e.args.message.from.subnetId, e.args.message.from.rawAddress.payload),
+      to: ipcAddr(e.args.message.to.subnetId, e.args.message.to.rawAddress.payload),
       value: formatFil(e.args.message.value)
     }
   })
@@ -296,8 +304,8 @@ export async function lastCheckpoint (subnetAddr) {
   const msgs = checkpoint.checkpoint.msgs.map(m => {
     return {
       kind: IPC_MSG_KIND.get(m.kind),
-      from: filAddr(m.from.rawAddress.payload),
-      to: filAddr(m.to.rawAddress.payload),
+      from: ipcAddr(m.from.subnetId, m.from.rawAddress.payload),
+      to: ipcAddr(m.to.subnetId, m.to.rawAddress.payload),
       value: formatFil(m.value)
     }
   })
