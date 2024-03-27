@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { HeaderWithTooltip } from './HeaderWithTooltip'
 import { lastCheckpoint } from './ipc'
 
 function Messages ({ messages }) {
@@ -96,15 +97,30 @@ export function LastCheckpoint ({ subnetAddr }) {
         <table>
           <tbody>
             <tr>
-              <th scope='row'>Block Height</th>
+              <HeaderWithTooltip
+                header="Block Height"
+                headerScope="row"
+                tooltip="Subnet block height"
+                tooltipPosition="top-left"
+              />
               <td>{checkpoint.blockHeight}</td>
             </tr>
             <tr>
-              <th scope='row'>Block Hash</th>
+              <HeaderWithTooltip
+                header="Block Hash"
+                headerScope="row"
+                tooltip="Subnet block hash"
+                tooltipPosition="top-left"
+              />
               <td>{checkpoint.blockHash}</td>
             </tr>
             <tr>
-              <th scope='row'>Next Configuration Number</th>
+              <HeaderWithTooltip
+                header="Next Configuration Number"
+                headerScope="row"
+                tooltip="The number of the membership (validator set) which is going to sign the next checkpoint"
+                tooltipPosition="top-left"
+              />
               <td>{checkpoint.nextConfigurationNumber}</td>
             </tr>
           </tbody>
