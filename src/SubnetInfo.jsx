@@ -141,7 +141,7 @@ export function SubnetInfo ({ subnet }) {
         <tbody>
             <tr>
               <th scope='row'>Contract Address</th>
-              <td><RootAddressLink addr={subnet.subnetAddr} /></td>
+              <td><RootAddressLink addrShort={subnet.subnetAddr} addrFull={subnet.subnetAddr} /></td>
             </tr>
             <tr>
               <th scope='row'>Created</th>

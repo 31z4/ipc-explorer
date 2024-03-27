@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom'
 import { HeaderWithTooltip } from './HeaderWithTooltip'
-import { RootBlockLink } from './RootBlockLink'
 
 export function SubnetList ({ subnets }) {
   let caption = ''
@@ -24,9 +23,9 @@ export function SubnetList ({ subnets }) {
             <th>Collateral</th>
             <th>Circulating Supply</th>
             <HeaderWithTooltip
-              header="Genesis"
+              header="Last Checkpoint"
               headerScope="col"
-              tooltip="Parent block in which the subnet was created"
+              tooltip="Last bottom-up checkpoint committed to the parent"
               tooltipPosition="top-right"
             />
             <HeaderWithTooltip
@@ -46,7 +45,7 @@ export function SubnetList ({ subnets }) {
                 <td className='u-truncate'><Link to={`subnets${s.subnetId}`} state={s} onClick= {() => window.scrollTo(0, 0)}>{s.subnetIdShort}</Link></td>
                 <td>{s.collateral}</td>
                 <td>{s.circulatingSupply}</td>
-                <td><RootBlockLink block={s.genesis} /></td>
+                <td>{s.lastCheckpoint}</td>
                 <td>{s.age}</td>
               </tr>
             </>

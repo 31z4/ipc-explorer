@@ -80,7 +80,7 @@ export function GenesisValidators ({ subnetAddr }) {
             return (
               <>
                 <tr>
-                  <td><RootAddressLink addr={v.addr} /></td>
+                  <td><RootAddressLink addrShort={v.addr} addrFull={v.addr} /></td>
                   <td>{v.confirmedCollateral}</td>
                   <td>{v.totalCollateral}</td>
                   <td><div className={stateClass}>{v.state}</div></td>

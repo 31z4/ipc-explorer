@@ -1,5 +1,5 @@
 import { newDelegatedEthAddress } from '@glif/filecoin-address'
-import { ethers, toBigInt, toNumber, toQuantity } from 'ethers'
+import { ethers, toNumber, toQuantity } from 'ethers'
 import humanizeDuration from 'humanize-duration'
 import { formatFil } from './utils'
 
@@ -243,10 +243,7 @@ function subnetStats (subnets) {
 
 export async function listSubnets () {
   const subnets = await rootGatewayContract.listSubnets()
-
   const stats = subnetStats(subnets)
-  const rootBlock = await rootProvider.send('eth_blockNumber')
-  stats.rootBlock = toBigInt(rootBlock).toString()
 
   // Reliable function to compare bigints.
   // You cannot simply substract b from a because the function must return a Number.
@@ -272,7 +269,6 @@ export async function listSubnets () {
   }).sort(compareGenesis)
 
   const now = Date.now()
-
   const subnetAge = async (subnet) => {
     const block = await rootProvider.send('eth_getBlockByNumber', [toQuantity(subnet.genesis), false])
     const blockTimestamp = block.timestamp * 1000
@@ -282,9 +278,16 @@ export async function listSubnets () {
     subnet.created_at = new Date(blockTimestamp).toUTCString()
     subnet.genesis = subnet.genesis.toString()
   }
+  const age = list.map(s => subnetAge(s))
 
-  const agePromices = list.map(s => subnetAge(s))
-  await Promise.all(agePromices)
+  const lastCheckpoint = async (subnet) => {
+    const subnetActorContract = new ethers.Contract(subnet.subnetAddr, SUBNET_ACTOR_ABI, rootProvider)
+    const lastBottomUpCheckpointHeight = await subnetActorContract.lastBottomUpCheckpointHeight()
+    subnet.lastCheckpoint = lastBottomUpCheckpointHeight.toString()
+  }
+  const checkpoint = list.map(s => lastCheckpoint(s))
+
+  await Promise.all(age.concat(checkpoint))
 
   return { list, stats }
 }
