@@ -26,7 +26,7 @@ export function Withdrawals ({ providerUrl, setProviderUrl }) {
   if (!providerUrl) {
     caption = (
         <caption>
-          Not connected to subnet RPC <button onClick={setProviderUrl}>Connect</button>
+          Not connected to subnet RPC&nbsp;<button onClick={setProviderUrl}>Connect</button>
         </caption>
     )
   } else if (isLoading) {

@@ -4,7 +4,7 @@ import humanizeDuration from 'humanize-duration'
 import { formatFil } from './utils'
 
 // 1500 blocks should work across majority of the public providers.
-const MAX_PROVIDER_BLOCKS = 1500
+export const MAX_PROVIDER_BLOCKS = 1500
 // const provider = new ethers.JsonRpcProvider('https://api.calibration.node.glif.io/rpc/v1')
 // const provider = new ethers.JsonRpcProvider('https://rpc.ankr.com/filecoin_testnet')
 const rootProvider = new ethers.JsonRpcProvider('https://calibration.filfox.info/rpc/v1')

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { HeaderWithTooltip } from './HeaderWithTooltip'
 import { RootAddressLink } from './RootAddressLink'
 import { genesisValidators } from './ipc'
 
@@ -52,8 +53,18 @@ export function GenesisValidators ({ subnetAddr }) {
         <thead>
           <tr>
             <th style={{ width: '50%' }}>Address</th>
-            <th>Confirmed Collateral</th>
-            <th>Total Collateral</th>
+            <HeaderWithTooltip
+              header="Confirmed Collateral"
+              headerScope="col"
+              tooltip="The amount of collateral actually confirmed in the subnet"
+              tooltipPosition="top-right"
+            />
+            <HeaderWithTooltip
+              header="Total Collateral"
+              headerScope="col"
+              tooltip="Aside from confirmed, there is also the collateral has been supplied, but not yet confirmed in the subnet"
+              tooltipPosition="top-right"
+            />
             <th>State</th>
           </tr>
         </thead>

@@ -26,7 +26,7 @@ export function Transactions ({ providerUrl, setProviderUrl }) {
   if (!providerUrl) {
     caption = (
         <caption>
-          Not connected to subnet RPC <button onClick={setProviderUrl}>Connect</button>
+          Not connected to subnet RPC&nbsp;<button onClick={setProviderUrl}>Connect</button>
         </caption>
     )
   } else if (isLoading) {
@@ -56,6 +56,11 @@ export function Transactions ({ providerUrl, setProviderUrl }) {
   return (
       <>
         <h3>Recent Transactions</h3>
+        <div className="p-notification--information is-inline">
+          <div className="p-notification__content">
+            <p className="p-notification__message">{'Showing at most 10 recent transactions due to performance reasons.'}</p>
+          </div>
+        </div>
         <table>
         <thead>
           <tr>

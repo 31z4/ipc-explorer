@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { RootAddressLink } from './RootAddressLink'
 import { RootMessageLink } from './RootMessageLink'
-import { subnetDeposits } from './ipc'
+import { MAX_PROVIDER_BLOCKS, subnetDeposits } from './ipc'
 
 export function Deposits ({ subnetAddr }) {
   const [deposits, setDeposits] = useState([])
@@ -49,6 +49,11 @@ export function Deposits ({ subnetAddr }) {
   return (
       <>
         <h3>Deposits</h3>
+        <div className="p-notification--information is-inline">
+          <div className="p-notification__content">
+            <p className="p-notification__message">{`Showing deposits from the last ${MAX_PROVIDER_BLOCKS} blocks due to public RPC provider limitations.`}</p>
+          </div>
+        </div>
         <table>
         <thead>
           <tr>
