@@ -29,9 +29,9 @@ Check out IPC Explorer [website](https://ipcexplorer.com) or run the application
 
 ## Known issues and limitations
 
-- **Subnet withdrawals may not work.**
-  Listing subnet withdrawals relies on the `NewBottomUpMsgBatch` event of the IPC Gateway Actor smart contract.
-  But for some reason, I do not observe such events during my local manual testing.
+- **Listing subnet withdrawals may not work.**
+  It relies on the `NewBottomUpMsgBatch` event of the IPC Gateway Actor smart contract.
+  But for some reason, I do not observe such events via a local subnet RPC during manual testing.
 - **Connecting to a subnet RPC provider is subject to [same-origin policy](https://developer.mozilla.org/en-US/docs/Web/Security/Same-origin_policy)**.
   Therefore, you can only connect to a local subnet RPC provider from a [locally running application](#running-locally).
   Connecting to a public subnet RPC provider is possible if the provider explicitly allows it by setting corresponding [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) headers.
